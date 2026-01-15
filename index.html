@@ -7,7 +7,6 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
-            /* Chart Container Styling as per requirements */
             .chart-container {
                 position: relative;
                 width: 100%;
@@ -22,8 +21,6 @@
                     height: 350px;
                 }
             }
-
-            /* Custom Scrollbar for itinerary text areas */
             .custom-scroll::-webkit-scrollbar {
                 width: 6px;
             }
@@ -37,851 +34,473 @@
             .custom-scroll::-webkit-scrollbar-thumb:hover {
                 background: #94a3b8;
             }
-
-            /* Transition effects */
             .fade-in {
                 animation: fadeIn 0.5s ease-in-out;
             }
             @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
             }
         </style>
-        <!-- Chosen Palette: Warm Neutrals (Stone) with Slate text and Amber/Teal accents for contrast -->
-        <!-- Application Structure Plan:
-         1. Header: Trip Profile & Context.
-         2. The Showdown (Dashboard): Interactive Radar Chart (Vibe Check) and Bar Chart (Cost Estimator) to immediately compare the two options visually.
-         3. Itinerary Explorer: A tabbed interface allowing users to switch between Option A and Option B, with a day-by-day slider to view specific activities without endless scrolling.
-         4. Survival Guide: Accordion-style practical tips for the specific "Bro-Trip" demographic.
-         This structure prioritizes decision-making (Battle Mode) followed by detailed planning (Itinerary).
-    -->
-        <!-- Visualization & Content Choices:
-         1. Radar Chart: To compare qualitative metrics (Comfort, Food, Nightlife, Budget Safety) -> Goal: Compare -> Chart.js.
-         2. Bar Chart: To compare estimated pocket money usage against the safe limit -> Goal: Inform/Budgeting -> Chart.js.
-         3. Interactive Cards: For Daily Itineraries to reduce text clutter -> Goal: Organize -> HTML/JS.
-         4. Dynamic Text: To update the "Verdict" based on user selection -> Goal: Inform -> JS.
-    -->
-        <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     </head>
     <body class="bg-stone-100 text-slate-800 font-sans selection:bg-amber-200">
-        <!-- Navbar / Header -->
         <header class="bg-slate-900 text-stone-100 shadow-lg sticky top-0 z-50">
-            <div
-                class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center"
-            >
+            <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
                 <div>
-                    <h1
-                        class="text-2xl font-bold tracking-tight text-amber-500"
-                    >
+                    <h1 class="text-2xl font-bold tracking-tight text-amber-500">
                         BRO-TRIP PLANNER
-                        <span
-                            class="text-xs text-stone-400 font-normal border border-stone-600 rounded px-2 py-0.5 ml-2"
-                            >BUDGET EDITION</span
-                        >
+                        <span class="text-xs text-stone-400 font-normal border border-stone-600 rounded px-2 py-0.5 ml-2">2026 EDITION</span>
                     </h1>
                     <p class="text-xs text-stone-400 mt-1">
-                        3 Orang | 5 Hari | Budget 5-6 Juta (Sisa Saku 2-3 Juta)
+                        3 Orang | 5 Hari | Mode: Hemat vs Sultan
                     </p>
                 </div>
                 <nav class="mt-4 md:mt-0 space-x-4 text-sm font-medium">
-                    <button
-                        onclick="scrollToSection('showdown')"
-                        class="hover:text-amber-400 transition-colors"
-                    >
-                        Perbandingan
-                    </button>
-                    <button
-                        onclick="scrollToSection('itinerary')"
-                        class="hover:text-amber-400 transition-colors"
-                    >
-                        Itinerary Harian
-                    </button>
-                    <button
-                        onclick="scrollToSection('tips')"
-                        class="hover:text-amber-400 transition-colors"
-                    >
-                        Tips Hemat
-                    </button>
+                    <button onclick="scrollToSection('showdown')" class="hover:text-amber-400 transition-colors">Perbandingan</button>
+                    <button onclick="scrollToSection('itinerary')" class="hover:text-amber-400 transition-colors">Itinerary Harian</button>
+                    <button onclick="scrollToSection('tips')" class="hover:text-amber-400 transition-colors">Tips Hemat</button>
                 </nav>
             </div>
         </header>
 
-        <!-- Main Content -->
         <main class="container mx-auto px-4 py-8 space-y-12">
-            <!-- Intro Section -->
             <section class="text-center max-w-3xl mx-auto mb-12 fade-in">
-                <h2
-                    class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4"
-                >
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
                     Pilih Medan Perang Kalian
                 </h2>
                 <p class="text-lg text-slate-600 leading-relaxed">
-                    Analisis mendalam untuk perjalanan 5 hari 4 malam dengan
-                    budget mahasiswa/fresh grad. Pilih antara bertahan hidup di
-                    kemewahan <strong>Singapura + Johor Bahru</strong> atau
-                    hidup bagai raja di <strong>Kuala Lumpur + Melaka</strong>.
+                    Analisis mendalam untuk perjalanan Mei 2026. Pilih destinasi dan sesuaikan dengan ketebalan dompet: <strong>Mode Hemat (Rp 2.5jt)</strong> buat survivor, atau <strong>Mode Ideal (Rp 3.5jt++)</strong> buat yang mau agak nyaman.
                 </p>
             </section>
 
-            <!-- SECTION 1: THE SHOWDOWN (Dashboard) -->
-            <section
-                id="showdown"
-                class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 md:p-8 scroll-mt-24"
-            >
+            <section id="showdown" class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 md:p-8 scroll-mt-24">
                 <div class="mb-6 border-b border-stone-100 pb-4">
-                    <h3
-                        class="text-2xl font-bold text-slate-800 flex items-center gap-2"
-                    >
+                    <h3 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
                         <span class="text-amber-600 text-xl">VS</span>
                         Head-to-Head Stats
                     </h3>
                     <p class="text-slate-500 text-sm mt-1">
-                        Visualisasi perbandingan kenyamanan, biaya, dan gaya
-                        liburan. Bagian ini membantu kalian memutuskan destinasi
-                        mana yang paling <em>worth it</em> dengan sisa uang saku
-                        Rp 2-3 Juta.
+                        Visualisasi perbandingan kenyamanan vs biaya berdasarkan mode yang dipilih.
                     </p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-                    <!-- Radar Chart: Vibe Check -->
                     <div class="flex flex-col">
-                        <h4
-                            class="text-center font-semibold text-slate-700 mb-4 uppercase tracking-wider text-sm"
-                        >
+                        <h4 class="text-center font-semibold text-slate-700 mb-4 uppercase tracking-wider text-sm">
                             Vibe & Comfort Level
                         </h4>
-                        <div
-                            class="chart-container bg-stone-50 rounded-lg p-2 border border-stone-100"
-                        >
+                        <div class="chart-container bg-stone-50 rounded-lg p-2 border border-stone-100">
                             <canvas id="vibeRadarChart"></canvas>
-                        </div>
-                        <div class="mt-4 text-xs text-center text-slate-500">
-                            *Skor 1-10 berdasarkan kecocokan budget & profil
-                            cowok 20an.
                         </div>
                     </div>
 
-                    <!-- Bar Chart: Cost Estimator -->
                     <div class="flex flex-col">
-                        <h4
-                            class="text-center font-semibold text-slate-700 mb-4 uppercase tracking-wider text-sm"
-                        >
+                        <h4 class="text-center font-semibold text-slate-700 mb-4 uppercase tracking-wider text-sm">
                             Estimasi Pengeluaran Saku (Per Orang)
                         </h4>
-                        <div
-                            class="chart-container bg-stone-50 rounded-lg p-2 border border-stone-100"
-                        >
+                        <div class="chart-container bg-stone-50 rounded-lg p-2 border border-stone-100">
                             <canvas id="costBarChart"></canvas>
                         </div>
-                        <div
-                            class="mt-4 p-3 bg-amber-50 border-l-4 border-amber-500 rounded text-xs text-slate-700"
-                        >
-                            <strong>Verdict:</strong> Opsi B (KL + Melaka)
-                            menyisakan ruang budget yang jauh lebih lega untuk
-                            belanja sneakers atau makan enak.
+                        <div class="mt-4 p-3 bg-amber-50 border-l-4 border-amber-500 rounded text-xs text-slate-700">
+                            <strong>Note:</strong> Grafik biaya akan berubah otomatis saat kalian mengganti Mode Budget di bawah (Hemat vs Ideal).
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- SECTION 2: ITINERARY EXPLORER -->
             <section id="itinerary" class="scroll-mt-24">
-                <div
-                    class="flex flex-col md:flex-row justify-between items-end mb-6"
-                >
-                    <div class="max-w-2xl">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
+                    <div class="max-w-xl">
                         <h3 class="text-2xl font-bold text-slate-800 mb-2">
                             Jelajahi Rencana Perjalanan
                         </h3>
-                        <p class="text-slate-600">
-                            Klik tombol opsi di bawah untuk melihat detail
-                            aktivitas harian. Kami telah menyusun alur yang
-                            memaksimalkan pengalaman gratisan dan kuliner murah.
+                        <p class="text-slate-600 text-sm">
+                            <span class="text-sky-500 font-bold">● Pagi (06-12)</span> | 
+                            <span class="text-orange-500 font-bold">● Siang/Sore (12-18)</span> | 
+                            <span class="text-slate-500 font-bold">● Malam (18-00)</span>
                         </p>
                     </div>
 
-                    <!-- Option Toggles -->
-                    <div class="flex bg-stone-200 p-1 rounded-lg mt-4 md:mt-0">
-                        <button
-                            id="btn-opt-a"
-                            onclick="switchOption('A')"
-                            class="px-6 py-2 rounded-md text-sm font-bold transition-all bg-white text-slate-900 shadow-sm"
-                        >
-                            Opsi A: SG + JB
-                        </button>
-                        <button
-                            id="btn-opt-b"
-                            onclick="switchOption('B')"
-                            class="px-6 py-2 rounded-md text-sm font-bold transition-all text-slate-600 hover:text-slate-900"
-                        >
-                            Opsi B: KL + Melaka
-                        </button>
+                    <div class="flex flex-col md:flex-row gap-3 items-end md:items-center">
+                         <div class="flex bg-slate-800 p-1 rounded-lg">
+                            <button id="btn-mode-press" onclick="switchMode('press')" class="px-4 py-2 rounded-md text-sm font-bold transition-all bg-amber-500 text-white shadow-sm">
+                                Mode Hemat (2.5jt)
+                            </button>
+                            <button id="btn-mode-ideal" onclick="switchMode('ideal')" class="px-4 py-2 rounded-md text-sm font-bold transition-all text-slate-400 hover:text-white">
+                                Mode Sultan (4jt++)
+                            </button>
+                        </div>
+
+                        <div class="flex bg-stone-200 p-1 rounded-lg">
+                            <button id="btn-opt-a" onclick="switchOption('A')" class="px-6 py-2 rounded-md text-sm font-bold transition-all text-slate-600 hover:text-slate-900">
+                                SG + JB
+                            </button>
+                            <button id="btn-opt-b" onclick="switchOption('B')" class="px-6 py-2 rounded-md text-sm font-bold transition-all bg-white text-slate-900 shadow-sm">
+                                KL + Melaka
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Itinerary Display Container -->
-                <div
-                    class="bg-white rounded-xl shadow-lg border border-stone-200 overflow-hidden min-h-[500px] flex flex-col md:flex-row"
-                >
-                    <!-- Day Navigator (Sidebar on Desktop, Top on Mobile) -->
-                    <div
-                        class="w-full md:w-1/4 bg-slate-50 border-b md:border-b-0 md:border-r border-stone-200 flex md:flex-col overflow-x-auto md:overflow-x-visible"
-                    >
-                        <div
-                            class="p-4 bg-slate-100 border-b border-stone-200 hidden md:block"
-                        >
-                            <span
-                                class="text-xs font-bold text-slate-400 uppercase"
-                                >Pilih Hari</span
-                            >
+                <div class="bg-white rounded-xl shadow-lg border border-stone-200 overflow-hidden min-h-[500px] flex flex-col md:flex-row">
+                    <div class="w-full md:w-1/4 bg-slate-50 border-b md:border-b-0 md:border-r border-stone-200 flex md:flex-col overflow-x-auto md:overflow-x-visible">
+                        <div class="p-4 bg-slate-100 border-b border-stone-200 hidden md:block">
+                            <span class="text-xs font-bold text-slate-400 uppercase">Pilih Hari</span>
                         </div>
-                        <!-- Generated via JS -->
-                        <div
-                            id="day-nav-container"
-                            class="flex md:flex-col w-full"
-                        >
-                            <!-- Buttons injected here -->
-                        </div>
+                        <div id="day-nav-container" class="flex md:flex-col w-full">
+                            </div>
                     </div>
 
-                    <!-- Content Area -->
-                    <div
-                        class="w-full md:w-3/4 p-6 md:p-8 flex flex-col relative"
-                    >
-                        <!-- Dynamic Header -->
-                        <div
-                            class="flex justify-between items-start mb-6 border-b border-stone-100 pb-4"
-                        >
+                    <div class="w-full md:w-3/4 p-6 md:p-8 flex flex-col relative">
+                        <div class="flex justify-between items-start mb-6 border-b border-stone-100 pb-4">
                             <div>
-                                <span
-                                    id="itinerary-tag"
-                                    class="inline-block px-2 py-1 rounded text-xs font-bold bg-amber-100 text-amber-800 mb-2"
-                                    >MODE HEMAT ABIS</span
-                                >
-                                <h2
-                                    id="itinerary-title"
-                                    class="text-2xl font-bold text-slate-900"
-                                >
-                                    Hari 1: Singapore (Jalan Kaki & Foto)
-                                </h2>
+                                <span id="itinerary-tag" class="inline-block px-2 py-1 rounded text-xs font-bold bg-amber-100 text-amber-800 mb-2">LOADING...</span>
+                                <h2 id="itinerary-title" class="text-2xl font-bold text-slate-900">...</h2>
                             </div>
                             <div class="text-right hidden sm:block">
-                                <span
-                                    class="block text-xs text-slate-400 uppercase"
-                                    >Fokus Utama</span
-                                >
-                                <span
-                                    id="itinerary-focus"
-                                    class="font-medium text-slate-700"
-                                    >Wisata Gratisan</span
-                                >
+                                <span class="block text-xs text-slate-400 uppercase">Total Harian</span>
+                                <span id="itinerary-focus" class="font-medium text-slate-700 font-mono text-amber-600">...</span>
                             </div>
                         </div>
 
-                        <!-- Dynamic Body -->
-                        <div
-                            id="itinerary-content"
-                            class="flex-grow space-y-6 text-slate-700 custom-scroll overflow-y-auto max-h-[600px] pr-2 fade-in"
-                        >
-                            <!-- Content injected here -->
-                        </div>
+                        <div id="itinerary-content" class="flex-grow space-y-6 text-slate-700 custom-scroll overflow-y-auto max-h-[600px] pr-2 fade-in">
+                            </div>
 
-                        <!-- Pro-Tip Box -->
-                        <div
-                            id="daily-tip"
-                            class="mt-8 p-4 bg-slate-800 text-stone-200 rounded-lg text-sm border-l-4 border-amber-500"
-                        >
-                            <span class="font-bold text-amber-400 mr-2"
-                                >PRO TIP:</span
-                            >
-                            <span id="tip-text"
-                                >Makan siang di Staff Canteen Changi, jauh lebih
-                                murah!</span
-                            >
+                        <div id="daily-tip" class="mt-8 p-4 bg-slate-800 text-stone-200 rounded-lg text-sm border-l-4 border-amber-500">
+                            <span class="font-bold text-amber-400 mr-2">BRO TIP:</span>
+                            <span id="tip-text">...</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- SECTION 3: TIPS & TRICKS -->
-            <section
-                id="tips"
-                class="grid grid-cols-1 md:grid-cols-3 gap-6 scroll-mt-24"
-            >
+            <section id="tips" class="grid grid-cols-1 md:grid-cols-3 gap-6 scroll-mt-24">
                 <div class="md:col-span-3 mb-4">
-                    <h3 class="text-2xl font-bold text-slate-800">
-                        Tips "Bro-Trip" Irit
-                    </h3>
-                    <p class="text-slate-600">
-                        Panduan survival untuk menjaga cashflow tetap aman.
-                    </p>
+                    <h3 class="text-2xl font-bold text-slate-800">Tips "Bro-Trip" Survival</h3>
+                    <p class="text-slate-600">Panduan biar gak boncos di tengah jalan.</p>
                 </div>
-
-                <!-- Card 1 -->
-                <div
-                    class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow"
-                >
+                <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
                     <div class="text-3xl mb-3">💧</div>
-                    <h4 class="font-bold text-slate-900 mb-2">
-                        Air Minum Strategis
-                    </h4>
-                    <p class="text-sm text-slate-600">
-                        Di SG air mineral itu "liquid gold" (SGD 2-3). Bawa
-                        botol kosong dari Jakarta, isi ulang di water fountain
-                        bandara, taman, atau mall. Di KL/Melaka aman, murah
-                        meriah.
-                    </p>
+                    <h4 class="font-bold text-slate-900 mb-2">Air Minum = Emas</h4>
+                    <p class="text-sm text-slate-600">Di SG, bawa botol kosong dari Indo. Isi di water fountain Changi/Mall. Di KL, beli galon di 7-11 buat di hotel.</p>
                 </div>
-
-                <!-- Card 2 -->
-                <div
-                    class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow"
-                >
-                    <div class="text-3xl mb-3">🚌</div>
-                    <h4 class="font-bold text-slate-900 mb-2">
-                        Transport Hacks
-                    </h4>
-                    <p class="text-sm text-slate-600">
-                        <strong>SG:</strong> Wajib Contactless Bank Indo
-                        (Jenius/Jago/dll) buat tap MRT biar ga beli kartu mahal.
-                        <br />
-                        <strong>KL:</strong> Cari Bus "GoKL" (Pink/Ungu). Itu
-                        gratis keliling Bukit Bintang - KLCC.
-                    </p>
+                <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="text-3xl mb-3">🚗</div>
+                    <h4 class="font-bold text-slate-900 mb-2">The Power of Grab</h4>
+                    <p class="text-sm text-slate-600">Kalian bertiga. Di Malaysia, jangan naik kereta bandara (mahal). Naik Grab bagi 3 jatuhnya seharga bus tapi VIP.</p>
                 </div>
-
-                <!-- Card 3 -->
-                <div
-                    class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow"
-                >
+                <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
                     <div class="text-3xl mb-3">📶</div>
-                    <h4 class="font-bold text-slate-900 mb-2">
-                        Koneksi & Hotel
-                    </h4>
-                    <p class="text-sm text-slate-600">
-                        Beli sim card lokal (Tunetalk/Singtel) satu aja terus
-                        tethering kalau mau super irit. Hotel cari "Triple Room"
-                        atau Hostel sekamar ber-3. Jauh lebih hemat dibanding
-                        sewa 2 kamar.
-                    </p>
+                    <h4 class="font-bold text-slate-900 mb-2">Koneksi Internet</h4>
+                    <p class="text-sm text-slate-600">Beli 1 Sim Card lokal (Tunetalk/Singtel) yang kuota besar, terus tethering bergilir. Gak usah beli Roaming Pass masing-masing.</p>
                 </div>
             </section>
         </main>
 
         <footer class="bg-slate-900 text-stone-400 py-8 mt-12">
             <div class="container mx-auto px-4 text-center">
-                <p class="text-sm">
-                    Generated for Budget Travelers | Source: Itinerary Budget
-                    Edition
-                </p>
-                <p class="text-xs mt-2 text-stone-600">
-                    Disclaimer: Harga dapat berubah sewaktu-waktu. Selalu cek
-                    rate kurs terbaru.
-                </p>
+                <p class="text-sm">Generated for 2026 Bro-Trip | Source: Itinerary Discussion</p>
+                <p class="text-xs mt-2 text-stone-600">Harga estimasi berdasarkan kurs & data tahun sebelumnya.</p>
             </div>
         </footer>
 
-        <!-- JavaScript Logic -->
         <script>
-            // --- DATA STORAGE ---
-            // Storing all report content in structured objects
+            // DATA STRUCTURE
             const itineraryData = {
-                A: {
-                    name: "Opsi A: SG + JB",
-                    tag: "MODE HEMAT ABIS",
-                    desc: "Warning: Karena sisa uang saku mepet (Rp 2-3 jt), di Singapura kita fokus wisata gratisan dan makan di Hawker Center. Di Johor Bahru baru bisa agak foya-foya.",
-                    days: [
-                        {
-                            title: "Hari 1: Singapore (Jalan Kaki & Foto)",
-                            focus: "Landmark Ikonik Gratis",
-                            content: `
-                            <ul class="list-none space-y-4">
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
-                                    <div>
-                                        <p class="font-semibold">Tiba di Changi Airport</p>
-                                        <p class="text-sm">Langsung cari <strong>Staff Canteen</strong>. Jangan makan di resto mall bandara kalau mau hemat. Tanya petugas arahnya.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Sore</span>
-                                    <div>
-                                        <p class="font-semibold">Check-in Hotel/Hostel</p>
-                                        <p class="text-sm">Area Geylang atau Lavender biasanya paling bersahabat di kantong.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
-                                    <div>
-                                        <p class="font-semibold">Marina Bay Sands Area (Gratis)</p>
-                                        <p class="text-sm mb-1">1. Nonton <strong>Spectra Light Show</strong> (depan MBS) jam 8/9 malam.</p>
-                                        <p class="text-sm">2. Jalan ke <strong>Gardens by the Bay</strong> nonton <strong>Garden Rhapsody</strong> jam 7.45/8.45 malam. Cukup keliling taman luar, skip Cloud Forest (mahal).</p>
-                                    </div>
-                                </li>
-                            </ul>
-                        `,
-                            tip: "Bawa botol minum kosong, isi di Changi sebelum keluar!",
-                        },
-                        {
-                            title: "Hari 2: Sentosa & Chinatown",
-                            focus: "Wisata Tanpa Tiket",
-                            content: `
-                            <ul class="list-none space-y-4">
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
-                                    <div>
-                                        <p class="font-semibold">Sarapan Legendaris</p>
-                                        <p class="text-sm">Ke <strong>Maxwell Food Centre</strong>. Pesen Tian Tian Chicken Rice. Satu porsi bisa sharing kalau mau super irit.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
-                                    <div>
-                                        <p class="font-semibold">Sentosa Island (Jalan Kaki)</p>
-                                        <p class="text-sm">Lewat <strong>Sentosa Boardwalk</strong> dari VivoCity (Gratis/Murah). Foto di bola dunia Universal Studios (luar aja). Lanjut nongkrong di Siloso Beach bawa minum dari 7-Eleven.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-slate-800 w-16 shrink-0">Sore</span>
-                                    <div>
-                                        <p class="font-semibold">Chinatown & Souvenir</p>
-                                        <p class="text-sm">Kunjungi Buddha Tooth Relic Temple (Gratis). Cari gantungan kunci 3 pcs $10 buat syarat oleh-oleh.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
-                                    <div>
-                                        <p class="font-semibold">Clarke Quay Hangout</p>
-                                        <p class="text-sm">Beli minum di minimarket, duduk di jembatan liat orang lewat. Ini kultur hemat anak muda lokal.</p>
-                                    </div>
-                                </li>
-                            </ul>
-                        `,
-                            tip: "Jangan tergoda naik Monorail ke Sentosa, jalan kaki di Boardwalk view-nya bagus dan sehat.",
-                        },
-                        {
-                            title: "Hari 3: Bye Mahal, Hello Murah (Ke JB)",
-                            focus: "Lintas Negara",
-                            content: `
-                            <ul class="list-none space-y-4">
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
-                                    <div>
-                                        <p class="font-semibold">Perjalanan ke Johor Bahru</p>
-                                        <p class="text-sm">Naik Bus 170 atau Causeway Link dari Queen Street Terminal (SGD 2.5 - 4). Siap-siap mental antri imigrasi.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
-                                    <div>
-                                        <p class="font-semibold">Tiba di JB (Surga Murah)</p>
-                                        <p class="text-sm">Makan besar di Nasi Kandar area JB Sentral. Check-in hotel.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-slate-800 w-16 shrink-0">Sore</span>
-                                    <div>
-                                        <p class="font-semibold">Heritage Walk</p>
-                                        <p class="text-sm">Jalan Tan Hiok Nee. Foto-foto vibe kota tua yang estetik.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
-                                    <div>
-                                        <p class="font-semibold">Pasar Karat (Night Market)</p>
-                                        <p class="text-sm">Thrifting baju, sneakers, aksesoris cowok. Makan seafood pinggir jalan harga kaki lima.</p>
-                                    </div>
-                                </li>
-                            </ul>
-                        `,
-                            tip: "Siapkan passport dan fisik prima buat antrian imigrasi.",
-                        },
-                        {
-                            title: "Hari 4: Have Fun di JB",
-                            focus: "Santai & Belanja",
-                            content: `
-                            <ul class="list-none space-y-4">
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
-                                    <div>
-                                        <p class="font-semibold">Sarapan Lokal</p>
-                                        <p class="text-sm">Roti Canai + Teh Tarik.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
-                                    <div>
-                                        <p class="font-semibold">Pilih Opsi:</p>
-                                        <p class="text-sm mb-1">A. <strong>Danga Bay</strong>: Pantai buatan, masuk gratis.</p>
-                                        <p class="text-sm">B. <strong>Johor Premium Outlets (JPO)</strong>: Naik bus dari JB Sentral. Cari diskon Nike/Adidas.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
-                                    <div>
-                                        <p class="font-semibold">Mamak Stall Culture</p>
-                                        <p class="text-sm">Cari warung 24 jam. Pesen Mie Goreng Mamak. Nongkrong sampe pagi ngobrolin hidup.</p>
-                                    </div>
-                                </li>
-                            </ul>
-                        `,
-                            tip: "Transport di JB paling enak pakai Grab (bagi 3 orang murah).",
-                        },
-                        {
-                            title: "Hari 5: Pulang",
-                            focus: "Oleh-oleh & Airport",
-                            content: `
-                            <ul class="list-none space-y-4">
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
-                                    <div>
-                                        <p class="font-semibold">Belanja Terakhir</p>
-                                        <p class="text-sm">Beryl's Chocolate atau supermarket biasa.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
-                                    <div>
-                                        <p class="font-semibold">OTW Bandara</p>
-                                        <p class="text-sm">Hati-hati kalau flight dari Changi, spare waktu 4-5 jam buat nyebrang perbatasan lagi.</p>
-                                    </div>
-                                </li>
-                            </ul>
-                        `,
-                            tip: "Cek traffic imigrasi lewat aplikasi sebelum berangkat ke perbatasan.",
-                        },
-                    ],
+                A: { // Option A: SG + JB
+                    name: "Singapura + JB",
+                    press: {
+                        tag: "SURVIVOR MODE (Rp 2.5jt)",
+                        desc: "Wisata gratis, Hawker Food, MRT Only, Dinner jam 19.00.",
+                        days: [
+                            {
+                                title: "Hari 1: Changi & City Lights", total: "SGD 35 (±410rb)", tip: "Isi air minum gratis di Changi sebelum keluar.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:00</span><div><p class="font-bold">Tiba & Lunch</p><p class="text-sm">Makan di Jewel (SGD 12)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">15:30</span><div><p class="font-bold">MRT ke Hotel</p><p class="text-sm">Changi -> Lavender/Geylang (SGD 3)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">16:30</span><div><p class="font-bold">Check-in</p><p class="text-sm">Taruh barang & Istirahat</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">17:30</span><div><p class="font-bold">MRT ke Merlion</p><p class="text-sm">Hotel -> Raffles Place (SGD 2)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner Lau Pa Sat</p><p class="text-sm">Sate & Seafood Murah (SGD 15)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">23:30</span><div><p class="font-bold">MRT Balik Hotel</p><p class="text-sm">Bayfront -> Hotel (SGD 3)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 2: Library & Zam Zam", total: "SGD 37 (±440rb)", tip: "Library@Orchard itu spot foto gratis yang estetik.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:30</span><div><p class="font-bold">Sarapan</p><p class="text-sm">Sandwich 7-Eleven (SGD 5)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:00</span><div><p class="font-bold">MRT ke Fort Canning</p><p class="text-sm">Hotel -> Fort Canning (SGD 2)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">12:30</span><div><p class="font-bold">MRT ke Maxwell</p><p class="text-sm">Fort Canning -> Maxwell (SGD 2)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:00</span><div><p class="font-bold">Lunch Maxwell</p><p class="text-sm">Chicken Rice Tian Tian (SGD 8)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">15:00</span><div><p class="font-bold">MRT ke Orchard</p><p class="text-sm">Maxwell -> Orchard (SGD 2)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">15:30</span><div><p class="font-bold">Wisata Gratis</p><p class="text-sm">Library@Orchard & Es Krim (SGD 2)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">18:30</span><div><p class="font-bold">MRT ke Bugis</p><p class="text-sm">Orchard -> Bugis (SGD 2)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner Zam Zam</p><p class="text-sm">Murtabak Haji Lane (SGD 12)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">23:30</span><div><p class="font-bold">MRT Balik Hotel</p><p class="text-sm">Bugis -> Hotel (SGD 2)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 3: JB Day Trip", total: "SGD 29 (±340rb)", tip: "Harga di JB itu Ringgit, manfaatkan buat makan enak!",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">07:30</span><div><p class="font-bold">Sarapan</p><p class="text-sm">Roti Bakar (SGD 5)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:30</span><div><p class="font-bold">MRT/Bus ke JB</p><p class="text-sm">Woodlands Checkpoint (SGD 4)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">11:30</span><div><p class="font-bold">Lunch JB</p><p class="text-sm">Mid Valley Southkey (SGD 10)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner JB</p><p class="text-sm">Lok-lok JB Sentral (SGD 10)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">21:00</span><div><p class="font-bold">Bus Balik SG</p><p class="text-sm">Via Woodlands (SGD 4)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 4: Sentosa & Gardens", total: "SGD 90 (±1jt)", tip: "Garden Rhapsody jam 20:45 itu gratis nonton lampunya.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:30</span><div><p class="font-bold">Sarapan</p><p class="text-sm">Roti Tawar/Minimarket (SGD 4)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">10:00</span><div><p class="font-bold">MRT ke Harbourfront</p><p class="text-sm">Jalan via Boardwalk (SGD 2)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:30</span><div><p class="font-bold">Lunch VivoCity</p><p class="text-sm">Katong Laksa (SGD 12)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">16:00</span><div><p class="font-bold">MRT ke Chinatown</p><p class="text-sm">Harbourfront -> Chinatown (SGD 2)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner Song Fa</p><p class="text-sm">Bak Kut Teh (SGD 18)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">20:30</span><div><p class="font-bold">MRT ke Gardens</p><p class="text-sm">Chinatown -> Bayfront (SGD 2)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">20:45</span><div><p class="font-bold">Gardens by the Bay</p><p class="text-sm">Tiket Cloud Forest + Show (SGD 53)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">23:30</span><div><p class="font-bold">MRT Balik Hotel</p><p class="text-sm">Bayfront -> Hotel (SGD 3)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 5: Pulang", total: "SGD 23 (±270rb)", tip: "Jangan lupa refund kartu transportasi kalo ada sisa banyak.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:30</span><div><p class="font-bold">Sarapan Little India</p><p class="text-sm">MRT ke Little India (SGD 2). Prata (SGD 8)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">11:30</span><div><p class="font-bold">MRT ke Changi</p><p class="text-sm">Little India -> Changi (SGD 3)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:30</span><div><p class="font-bold">Final Lunch</p><p class="text-sm">Jewel Changi (SGD 10)</p></div></li>
+                                </ul>`
+                            }
+                        ]
+                    },
+                    ideal: {
+                        tag: "COMFORT MODE (Rp 3.5jt++)",
+                        desc: "Full Grab, Makan Resto AC, Wahana Berbayar.",
+                        days: [
+                            {
+                                title: "Hari 1: Changi & Cruise", total: "SGD 94 (±1.1jt)", tip: "Naik Grab bertiga lebih hemat tenaga dibanding geret koper di MRT.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:00</span><div><p class="font-bold">Tiba & Lunch</p><p class="text-sm">Shake Shack Jewel (SGD 20)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">15:30</span><div><p class="font-bold">Grab ke Hotel</p><p class="text-sm">Patungan bertiga (SGD 8)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">17:30</span><div><p class="font-bold">Grab ke Merlion</p><p class="text-sm">Patungan bertiga (SGD 5)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">18:00</span><div><p class="font-bold">River Cruise</p><p class="text-sm">Naik Kapal (SGD 28)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner Lau Pa Sat</p><p class="text-sm">Set Sate Premium (SGD 25)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">23:30</span><div><p class="font-bold">Grab Balik Hotel</p><p class="text-sm">Patungan bertiga (SGD 8)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 2: Full Gardens", total: "SGD 150 (±1.8jt)", tip: "Tiong Bahru Bakery punya croissant terbaik di SG.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:00</span><div><p class="font-bold">Breakfast Sultan</p><p class="text-sm">Tiong Bahru Bakery (SGD 15)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:30</span><div><p class="font-bold">Grab ke Gardens</p><p class="text-sm">Patungan (SGD 5)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">10:00</span><div><p class="font-bold">Gardens Full Access</p><p class="text-sm">Cloud Forest, Dome, Floral (SGD 65)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:00</span><div><p class="font-bold">Grab ke Song Fa</p><p class="text-sm">Patungan (SGD 5)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:30</span><div><p class="font-bold">Lunch Song Fa</p><p class="text-sm">Resto AC (SGD 22)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-15:30</span><div><p class="font-bold">Grab ke Orchard</p><p class="text-sm">Patungan (SGD 5)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner Clarke Quay</p><p class="text-sm">Grab ke lokasi (SGD 5). Makan (SGD 30)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">23:30</span><div><p class="font-bold">Grab Balik Hotel</p><p class="text-sm">Patungan (SGD 8)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 3: Private JB Trip", total: "SGD 110 (±1.3jt)", tip: "Sewa mobil private = bebas antre imigrasi.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:00</span><div><p class="font-bold">Private Car ke JB</p><p class="text-sm">Jemput di Hotel (SGD 20/org)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">12:00</span><div><p class="font-bold">Lunch Seafood JB</p><p class="text-sm">Makan Besar (SGD 20)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">15:00</span><div><p class="font-bold">Massage & Relax</p><p class="text-sm">Refleksi (SGD 25)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner JB</p><p class="text-sm">Makan Malam (SGD 10)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">21:00</span><div><p class="font-bold">Balik Singapura</p><p class="text-sm">Mobil Private (SGD 20/org)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 4: Sentosa Fun", total: "SGD 160 (±1.9jt)", tip: "Main Luge minimal 3x baru puas!",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:00</span><div><p class="font-bold">Breakfast</p><p class="text-sm">Toast Box (SGD 10)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">10:00</span><div><p class="font-bold">Grab ke Sentosa</p><p class="text-sm">Patungan (SGD 7)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">10:30</span><div><p class="font-bold">Skyline Luge</p><p class="text-sm">Tiket 3 Rides (SGD 30)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:30</span><div><p class="font-bold">Lunch VivoCity</p><p class="text-sm">Restoran (SGD 20)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">16:00</span><div><p class="font-bold">S.E.A Aquarium</p><p class="text-sm">Tiket Masuk (SGD 45)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner Chilli Crab</p><p class="text-sm">Grab ke Chinatown (SGD 5). Makan (SGD 35)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">23:30</span><div><p class="font-bold">Grab Balik Hotel</p><p class="text-sm">Patungan (SGD 8)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 5: Tiong Bahru", total: "SGD 46 (±540rb)", tip: "Croissant Tiong Bahru Bakery itu legendaris.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:00</span><div><p class="font-bold">Breakfast Sultan</p><p class="text-sm">Tiong Bahru Bakery (SGD 23)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">11:30</span><div><p class="font-bold">Grab ke Bandara</p><p class="text-sm">Patungan (SGD 8)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:00</span><div><p class="font-bold">Lunch Terakhir</p><p class="text-sm">Jewel (SGD 15)</p></div></li>
+                                </ul>`
+                            }
+                        ]
+                    }
                 },
-                B: {
-                    name: "Opsi B: KL + Melaka",
-                    tag: "RAJA JALANAN",
-                    desc: "Verdict: Paling pas buat budget kalian. Bisa makan enak terus, nongkrong lama, dan transport murah.",
-                    days: [
-                        {
-                            title: "Hari 1: KL City Attack",
-                            focus: "City Center & Landmark",
-                            content: `
-                            <ul class="list-none space-y-4">
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
-                                    <div>
-                                        <p class="font-semibold">Tiba di KLIA</p>
-                                        <p class="text-sm">Naik Bus ke KL Sentral (RM 12-15), jauh lebih murah dari kereta ekspres.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Sore</span>
-                                    <div>
-                                        <p class="font-semibold">Bukit Bintang</p>
-                                        <p class="text-sm">Check-in hotel area sini. Jalan kaki ke Pavilion Mall, cuci mata liat lifestyle KL.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
-                                    <div>
-                                        <p class="font-semibold">KLCC Petronas Towers</p>
-                                        <p class="text-sm">Foto spot wajib saat nyala. Makan di <strong>Jalan Sahabat</strong> atau <strong>Nasi Kandar Pelita</strong> dekat KLCC (RM 15-20 kenyang). Hindari Jalan Alor (Mahal).</p>
-                                    </div>
-                                </li>
-                            </ul>
-                        `,
-                            tip: "Gunakan Bus Gratis 'GoKL' warna pink/ungu untuk keliling area pusat kota.",
-                        },
-                        {
-                            title: "Hari 2: Budaya & Gaul",
-                            focus: "Culture & Nightlife",
-                            content: `
-                            <ul class="list-none space-y-4">
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
-                                    <div>
-                                        <p class="font-semibold">Batu Caves</p>
-                                        <p class="text-sm">Naik KTM Komuter (murah). Foto di tangga warna-warni & patung emas. Gratis masuk.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
-                                    <div>
-                                        <p class="font-semibold">Pasar Seni & Petaling Street</p>
-                                        <p class="text-sm">Cari baju/kaos murah di Central Market. Jalan kaki ke Chinatown (Petaling Street).</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-slate-800 w-16 shrink-0">Sore</span>
-                                    <div>
-                                        <p class="font-semibold">River of Life</p>
-                                        <p class="text-sm">Dekat Masjid Jamek. Keren buat foto pas sore/malam ada kabut buatan.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
-                                    <div>
-                                        <p class="font-semibold">Changkat / Kampung Baru</p>
-                                        <p class="text-sm">Pilih: Nightlife di Changkat (Bar/Pub) atau Wisata Kuliner Nasi Lemak Wanjo di Kampung Baru.</p>
-                                    </div>
-                                </li>
-                            </ul>
-                        `,
-                            tip: "Batu Caves panas banget, datang sepagi mungkin.",
-                        },
-                        {
-                            title: "Hari 3: Roadtrip ke Melaka",
-                            focus: "Historical City",
-                            content: `
-                            <ul class="list-none space-y-4">
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
-                                    <div>
-                                        <p class="font-semibold">Bus ke Melaka</p>
-                                        <p class="text-sm">Ke terminal TBS. Bus ke Melaka cuma RM 10-15. Nyaman dan on-time.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
-                                    <div>
-                                        <p class="font-semibold">Melaka City</p>
-                                        <p class="text-sm">Check-in sekitar Jonker Walk. Sewa sepeda atau jalan kaki.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-slate-800 w-16 shrink-0">Sore</span>
-                                    <div>
-                                        <p class="font-semibold">Red Square</p>
-                                        <p class="text-sm">Stadthuys, A Famosa, naik bukit St Paul (View gratis).</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
-                                    <div>
-                                        <p class="font-semibold">Jonker Walk Night Market</p>
-                                        <p class="text-sm">Wajib Jumat-Minggu. Jajan street food aneh-aneh (telur puyuh, oyster, dimsum). Murah!</p>
-                                    </div>
-                                </li>
-                            </ul>
-                        `,
-                            tip: "Booking tiket bus via online (RedBus/Easybook) biar tenang.",
-                        },
-                        {
-                            title: "Hari 4: Santai & Balik KL",
-                            focus: "Sightseeing & Shopping",
-                            content: `
-                            <ul class="list-none space-y-4">
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
-                                    <div>
-                                        <p class="font-semibold">Masjid Selat Melaka</p>
-                                        <p class="text-sm">Sarapan Cendol Durian dulu, terus naik Grab bertiga ke Floating Mosque.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
-                                    <div>
-                                        <p class="font-semibold">Balik ke KL</p>
-                                        <p class="text-sm">Bus dari Melaka Sentral ke TBS.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
-                                    <div>
-                                        <p class="font-semibold">Belanja Oleh-oleh</p>
-                                        <p class="text-sm">Ke supermarket Giant/Mydin atau Beryl's. Harga coklat jauh lebih murah daripada di bandara.</p>
-                                    </div>
-                                </li>
-                            </ul>
-                        `,
-                            tip: "Mydin supermarket adalah tempat rahasia beli oleh-oleh murah.",
-                        },
-                        {
-                            title: "Hari 5: Putrajaya (Bonus)",
-                            focus: "Beautiful Government City",
-                            content: `
-                            <ul class="list-none space-y-4">
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
-                                    <div>
-                                        <p class="font-semibold">Stopover Putrajaya</p>
-                                        <p class="text-sm">Naik KLIA Transit turun Putrajaya Sentral. Sewa Grab keliling liat Masjid Pink.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-3">
-                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
-                                    <div>
-                                        <p class="font-semibold">Flight Pulang</p>
-                                        <p class="text-sm">Makan siang di food court bandara (Quizinn) harga masih oke.</p>
-                                    </div>
-                                </li>
-                            </ul>
-                        `,
-                            tip: "Putrajaya sangat instagramable buat foto grup cowok-cowok.",
-                        },
-                    ],
-                },
+                B: { // Option B: KL + Melaka
+                    name: "KL + Melaka",
+                    press: {
+                        tag: "RAJA JALANAN (Rp 2.5jt)",
+                        desc: "Grab bertiga, MyCiti Hotel, Makan Enak.",
+                        days: [
+                            {
+                                title: "Hari 1: City & Alor", total: "RM 80 (±290rb)", tip: "Grab bertiga di KL jauh lebih murah dari KLIA Ekspres.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:00</span><div><p class="font-bold">Tiba & Grab Hotel</p><p class="text-sm">MyCiti Hotel (RM 25/org)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">15:30</span><div><p class="font-bold">Check-in</p><p class="text-sm">Jalan kaki ke Merdeka Sq (Free)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">18:30</span><div><p class="font-bold">Grab ke Alor</p><p class="text-sm">Ke Bukit Bintang (RM 5)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner Alor</p><p class="text-sm">Seafood Street Food (RM 45)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">21:00</span><div><p class="font-bold">Grab ke KLCC</p><p class="text-sm">Foto Twin Tower (RM 5)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">23:30</span><div><p class="font-bold">Grab Balik Hotel</p><p class="text-sm">Ke MyCiti (RM 5)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 2: Batu & Genting", total: "RM 120 (±430rb)", tip: "Naik Awana Skyway dapet view hutan yang keren.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:00</span><div><p class="font-bold">Sarapan</p><p class="text-sm">Roti Canai + Teh Tarik (RM 10)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:00</span><div><p class="font-bold">Grab Batu Caves</p><p class="text-sm">Patungan (RM 10)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">12:00</span><div><p class="font-bold">Lunch Kandar</p><p class="text-sm">Grab ke Resto (RM 10). Makan (RM 20)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">14:00</span><div><p class="font-bold">Grab ke Genting</p><p class="text-sm">Grab (RM 30). Cable Car (RM 20)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner</p><p class="text-sm">Makan di Genting/KL (RM 40)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">21:00</span><div><p class="font-bold">Changkat</p><p class="text-sm">Nongkrong Malam (RM 20)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">23:30</span><div><p class="font-bold">Grab Balik Hotel</p><p class="text-sm">Ke MyCiti (RM 10)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 3: Melaka Trip", total: "RM 135 (±480rb)", tip: "Jonker Street itu wajib banget buat kulineran malam.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">07:30</span><div><p class="font-bold">Sarapan</p><p class="text-sm">Sandwich/Minimarket (RM 10)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:30</span><div><p class="font-bold">Ke Melaka</p><p class="text-sm">Grab TBS (RM 10). Bus (RM 15)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">11:30</span><div><p class="font-bold">Explore Melaka</p><p class="text-sm">River Cruise (RM 30). Makan (RM 25)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">17:30</span><div><p class="font-bold">Sunset Masjid</p><p class="text-sm">Grab ke Masjid Selat (RM 10)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner Jonker</p><p class="text-sm">Street Food (RM 30)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">21:00</span><div><p class="font-bold">Balik KL</p><p class="text-sm">Bus ke TBS (RM 15). Grab Hotel (RM 10)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 4: Aquaria & Putrajaya", total: "RM 215 (±770rb)", tip: "Putrajaya kalau malam lampunya bagus banget buat foto.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:30</span><div><p class="font-bold">Sarapan</p><p class="text-sm">Roti Bakar (RM 10)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">10:00</span><div><p class="font-bold">Grab Aquaria</p><p class="text-sm">Patungan (RM 5). Tiket (RM 75)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:00</span><div><p class="font-bold">Lunch & Shop</p><p class="text-sm">Pavilion (RM 40). Grab Central Market (RM 10)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">15:30</span><div><p class="font-bold">Petaling Street</p><p class="text-sm">Kwai Chai Hong Mural (Free)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner Chinatown</p><p class="text-sm">Makan Enak (RM 45)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">21:00</span><div><p class="font-bold">Putrajaya Night</p><p class="text-sm">Grab ke Putrajaya (RM 40)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">23:30</span><div><p class="font-bold">Balik Hotel</p><p class="text-sm">Grab ke MyCiti (RM 20)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 5: Oleh-oleh", total: "RM 185 (±660rb)", tip: "Belanja coklat di Mydin lebih murah dari bandara.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:30</span><div><p class="font-bold">Sarapan</p><p class="text-sm">Masjid India (RM 15)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:00</span><div><p class="font-bold">Belanja Mydin</p><p class="text-sm">Oleh-oleh (RM 100)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">12:00</span><div><p class="font-bold">Lunch & Airport</p><p class="text-sm">Makan (RM 45). Grab ke KLIA (RM 25)</p></div></li>
+                                </ul>`
+                            }
+                        ]
+                    },
+                    ideal: {
+                        tag: "SULTAN MODE (Rp 4jt++)",
+                        desc: "Private Car Melaka, SkyWorlds, Fine Dining.",
+                        days: [
+                            {
+                                title: "Hari 1: Luxury KL", total: "RM 295 (±1jt)", tip: "Heli Lounge Bar harus booking dulu biar dapet spot sunset.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:00</span><div><p class="font-bold">Tiba di KLIA</p><p class="text-sm">Grab Premium ke Hotel (RM 35)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">15:30</span><div><p class="font-bold">Lunch</p><p class="text-sm">Nasi Kandar Spesial (RM 30)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner Sultan</p><p class="text-sm">Seafood + Musang King (RM 100)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">21:00</span><div><p class="font-bold">Heli Lounge</p><p class="text-sm">Rooftop Bar (RM 50)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">00:00</span><div><p class="font-bold">Balik Hotel</p><p class="text-sm">Grab Premium (RM 15)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 2: SkyWorlds", total: "RM 355 (±1.2jt)", tip: "Main SkyWorlds seharian worth it banget.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:00</span><div><p class="font-bold">Sarapan & Batu Caves</p><p class="text-sm">Makan (RM 30). Grab (RM 10)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">11:30</span><div><p class="font-bold">Ke Genting</p><p class="text-sm">Grab (RM 30). Lunch (RM 50)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">14:00</span><div><p class="font-bold">Genting SkyWorlds</p><p class="text-sm">Tiket Theme Park (RM 180)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner KLCC</p><p class="text-sm">View Petronas (RM 50)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">23:30</span><div><p class="font-bold">Balik Hotel</p><p class="text-sm">Grab (RM 5)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 3: Private Melaka", total: "RM 290 (±1jt)", tip: "Sewa mobil private = anti capek di jalan.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:00</span><div><p class="font-bold">Private Car Melaka</p><p class="text-sm">Jemput di Hotel (RM 100/org)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">11:30</span><div><p class="font-bold">Lunch Nyonya</p><p class="text-sm">Makan Otentik (RM 50)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">14:00</span><div><p class="font-bold">Wisata Melaka</p><p class="text-sm">Cruise & Taming Sari (RM 50)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner Jonker</p><p class="text-sm">Makan Malam (RM 40)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">22:00</span><div><p class="font-bold">Balik KL</p><p class="text-sm">Mobil Private</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 4: Shop & Fine Dining", total: "RM 585 (±2.1jt)", tip: "Fine Dining di KL harganya masih masuk akal dibanding SG.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:00</span><div><p class="font-bold">Sarapan Cafe</p><p class="text-sm">Petaling St (RM 40)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">10:00</span><div><p class="font-bold">KL Tower & Aquaria</p><p class="text-sm">Tiket (RM 150)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:30</span><div><p class="font-bold">Lunch Pavilion</p><p class="text-sm">Makan (RM 60)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">16:00</span><div><p class="font-bold">Branded Shopping</p><p class="text-sm">Budget (RM 200)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">20:00</span><div><p class="font-bold">Fine Dining</p><p class="text-sm">Mewah (RM 120)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">23:30</span><div><p class="font-bold">Balik Hotel</p><p class="text-sm">Grab (RM 5)</p></div></li>
+                                </ul>`
+                            },
+                            {
+                                title: "Hari 5: Premium Oleh-oleh", total: "RM 220 (±790rb)", tip: "Beryl's Coklat kaleng enak banget buat oleh-oleh.",
+                                content: `
+                                <ul class="list-none space-y-4">
+                                    <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:30</span><div><p class="font-bold">Sarapan Cafe</p><p class="text-sm">Merchant's Lane (RM 40)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">11:00</span><div><p class="font-bold">Borong Coklat</p><p class="text-sm">Beryl's Premium (RM 150)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:00</span><div><p class="font-bold">Ke Bandara</p><p class="text-sm">Grab (RM 30)</p></div></li>
+                                </ul>`
+                            }
+                        ]
+                    }
+                }
             };
 
             // Global State
-            let currentOption = "B"; // Default to B (The Winner)
+            let currentOption = "B"; // A or B (Country)
+            let currentMode = "press"; // press or ideal (Budget)
             let currentDay = 0;
+            let barChartInstance = null;
+            let radarChartInstance = null;
 
-            // --- CHART GENERATION ---
+            // --- INITIALIZATION ---
             document.addEventListener("DOMContentLoaded", () => {
                 initRadarChart();
                 initBarChart();
                 renderItinerary();
             });
 
-            function initRadarChart() {
-                const ctx = document
-                    .getElementById("vibeRadarChart")
-                    .getContext("2d");
-                new Chart(ctx, {
-                    type: "radar",
-                    data: {
-                        labels: [
-                            "Kenyamanan",
-                            "Kuliner",
-                            "Nightlife",
-                            "Modernitas",
-                            "Ramah Budget",
-                        ],
-                        datasets: [
-                            {
-                                label: "Opsi A: SG + JB",
-                                data: [5, 7, 6, 9, 5],
-                                fill: true,
-                                backgroundColor: "rgba(148, 163, 184, 0.2)", // Slate
-                                borderColor: "rgb(148, 163, 184)",
-                                pointBackgroundColor: "rgb(148, 163, 184)",
-                                pointBorderColor: "#fff",
-                                pointHoverBackgroundColor: "#fff",
-                                pointHoverBorderColor: "rgb(148, 163, 184)",
-                            },
-                            {
-                                label: "Opsi B: KL + Melaka",
-                                data: [8, 9, 8, 7, 9],
-                                fill: true,
-                                backgroundColor: "rgba(245, 158, 11, 0.2)", // Amber
-                                borderColor: "rgb(245, 158, 11)",
-                                pointBackgroundColor: "rgb(245, 158, 11)",
-                                pointBorderColor: "#fff",
-                                pointHoverBackgroundColor: "#fff",
-                                pointHoverBorderColor: "rgb(245, 158, 11)",
-                            },
-                        ],
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        scales: {
-                            r: {
-                                angleLines: { color: "#e5e7eb" },
-                                grid: { color: "#e5e7eb" },
-                                suggestedMin: 0,
-                                suggestedMax: 10,
-                                ticks: { display: false },
-                            },
-                        },
-                        plugins: {
-                            legend: { position: "bottom" },
-                        },
-                    },
-                });
-            }
-
-            function initBarChart() {
-                const ctx = document
-                    .getElementById("costBarChart")
-                    .getContext("2d");
-                new Chart(ctx, {
-                    type: "bar",
-                    data: {
-                        labels: ["Makan", "Transport", "Oleh-oleh/Lainnya"],
-                        datasets: [
-                            {
-                                label: "Opsi A (SG+JB) - IDR",
-                                data: [900000, 450000, 600000], // Approx breakdown
-                                backgroundColor: "#94a3b8",
-                                stack: "Stack 0",
-                            },
-                            {
-                                label: "Opsi B (KL+Melaka) - IDR",
-                                data: [750000, 350000, 600000], // Approx breakdown
-                                backgroundColor: "#f59e0b",
-                                stack: "Stack 1",
-                            },
-                        ],
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function (context) {
-                                        let label = context.dataset.label || "";
-                                        if (label) {
-                                            label += ": ";
-                                        }
-                                        if (context.parsed.y !== null) {
-                                            label += new Intl.NumberFormat(
-                                                "id-ID",
-                                                {
-                                                    style: "currency",
-                                                    currency: "IDR",
-                                                    maximumSignificantDigits: 3,
-                                                },
-                                            ).format(context.parsed.y);
-                                        }
-                                        return label;
-                                    },
-                                },
-                            },
-                            legend: { position: "bottom" },
-                            title: {
-                                display: true,
-                                text: "Sisa Uang Saku Max: Rp 2.500.000",
-                            },
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: { color: "#f5f5f4" },
-                            },
-                            x: {
-                                grid: { display: false },
-                            },
-                        },
-                    },
-                });
-            }
-
-            // --- INTERACTION LOGIC ---
-
+            // --- INTERACTION FUNCTIONS ---
             function switchOption(option) {
                 currentOption = option;
-                currentDay = 0; // Reset to day 1 on switch
-
-                // Toggle Button Styles
-                const btnA = document.getElementById("btn-opt-a");
-                const btnB = document.getElementById("btn-opt-b");
-
-                if (option === "A") {
-                    btnA.className =
-                        "px-6 py-2 rounded-md text-sm font-bold transition-all bg-white text-slate-900 shadow-sm ring-1 ring-slate-200";
-                    btnB.className =
-                        "px-6 py-2 rounded-md text-sm font-bold transition-all text-slate-500 hover:text-slate-900";
-                } else {
-                    btnA.className =
-                        "px-6 py-2 rounded-md text-sm font-bold transition-all text-slate-500 hover:text-slate-900";
-                    btnB.className =
-                        "px-6 py-2 rounded-md text-sm font-bold transition-all bg-white text-amber-600 shadow-sm ring-1 ring-amber-200";
-                }
-
+                currentDay = 0;
+                updateButtons();
                 renderItinerary();
+                updateBarChart();
+            }
+
+            function switchMode(mode) {
+                currentMode = mode;
+                currentDay = 0;
+                updateButtons();
+                renderItinerary();
+                updateBarChart();
             }
 
             function switchDay(dayIndex) {
@@ -889,71 +508,141 @@
                 renderItinerary();
             }
 
+            function updateButtons() {
+                const btnA = document.getElementById("btn-opt-a");
+                const btnB = document.getElementById("btn-opt-b");
+                
+                if (currentOption === "A") {
+                    btnA.className = "px-6 py-2 rounded-md text-sm font-bold transition-all bg-white text-slate-900 shadow-sm";
+                    btnB.className = "px-6 py-2 rounded-md text-sm font-bold transition-all text-slate-600 hover:text-slate-900";
+                } else {
+                    btnA.className = "px-6 py-2 rounded-md text-sm font-bold transition-all text-slate-600 hover:text-slate-900";
+                    btnB.className = "px-6 py-2 rounded-md text-sm font-bold transition-all bg-white text-slate-900 shadow-sm";
+                }
+
+                const btnPress = document.getElementById("btn-mode-press");
+                const btnIdeal = document.getElementById("btn-mode-ideal");
+
+                if (currentMode === "press") {
+                    btnPress.className = "px-4 py-2 rounded-md text-sm font-bold transition-all bg-amber-500 text-white shadow-sm";
+                    btnIdeal.className = "px-4 py-2 rounded-md text-sm font-bold transition-all text-slate-400 hover:text-white";
+                } else {
+                    btnPress.className = "px-4 py-2 rounded-md text-sm font-bold transition-all text-slate-400 hover:text-white";
+                    btnIdeal.className = "px-4 py-2 rounded-md text-sm font-bold transition-all bg-amber-500 text-white shadow-sm";
+                }
+            }
+
+            // --- RENDER FUNCTIONS ---
             function renderItinerary() {
-                const data = itineraryData[currentOption];
+                const data = itineraryData[currentOption][currentMode];
                 const dayData = data.days[currentDay];
 
-                // 1. Render Nav Buttons
-                const navContainer =
-                    document.getElementById("day-nav-container");
+                const navContainer = document.getElementById("day-nav-container");
                 navContainer.innerHTML = "";
                 data.days.forEach((day, index) => {
                     const btn = document.createElement("button");
                     const isActive = index === currentDay;
-
-                    let baseClasses =
-                        "w-full text-left p-4 text-sm font-medium border-b border-slate-100 transition-colors flex justify-between items-center";
-                    let activeClasses = isActive
-                        ? currentOption === "A"
-                            ? "bg-white text-slate-900 border-l-4 border-l-slate-900"
-                            : "bg-white text-amber-600 border-l-4 border-l-amber-500"
-                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-700";
-
-                    // Mobile adjustment (horizontal flex)
+                    let baseClasses = "w-full text-left p-4 text-sm font-medium border-b border-slate-100 transition-colors flex justify-between items-center";
+                    let activeClasses = isActive ? "bg-white text-amber-600 border-l-4 border-l-amber-500" : "text-slate-500 hover:bg-slate-50";
+                    
                     if (window.innerWidth < 768) {
-                        baseClasses =
-                            "flex-shrink-0 w-auto p-3 text-xs border-r border-stone-200";
-                        activeClasses = isActive
-                            ? currentOption === "A"
-                                ? "bg-white text-slate-900 border-b-4 border-b-slate-900"
-                                : "bg-white text-amber-600 border-b-4 border-b-amber-500"
-                            : "text-slate-500 bg-stone-50";
+                        baseClasses = "flex-shrink-0 w-auto p-3 text-xs border-r border-stone-200";
+                        activeClasses = isActive ? "bg-white text-amber-600 border-b-4 border-b-amber-500" : "text-slate-500 bg-stone-50";
                     }
 
                     btn.className = `${baseClasses} ${activeClasses}`;
                     btn.onclick = () => switchDay(index);
-                    btn.innerHTML = `<span>Hari ${index + 1}</span> ${isActive ? "<span>👉</span>" : ""}`;
+                    btn.innerHTML = `<span>Hari ${index + 1}</span> ${isActive ? "<span>🎯</span>" : ""}`;
                     navContainer.appendChild(btn);
                 });
 
-                // 2. Update Header Info
                 const tag = document.getElementById("itinerary-tag");
                 tag.innerText = data.tag;
-                tag.className = `inline-block px-2 py-1 rounded text-xs font-bold mb-2 ${currentOption === "A" ? "bg-slate-200 text-slate-700" : "bg-amber-100 text-amber-800"}`;
+                if(currentMode === 'press') {
+                    tag.className = "inline-block px-2 py-1 rounded text-xs font-bold bg-emerald-100 text-emerald-800 mb-2";
+                } else {
+                    tag.className = "inline-block px-2 py-1 rounded text-xs font-bold bg-purple-100 text-purple-800 mb-2";
+                }
 
-                document.getElementById("itinerary-title").innerText =
-                    dayData.title;
-                document.getElementById("itinerary-focus").innerText =
-                    dayData.focus;
-
-                // 3. Update Content Body (with simple animation reset)
+                document.getElementById("itinerary-title").innerText = dayData.title;
+                document.getElementById("itinerary-focus").innerText = dayData.total;
+                
                 const contentBox = document.getElementById("itinerary-content");
                 contentBox.classList.remove("fade-in");
-                void contentBox.offsetWidth; // trigger reflow
+                void contentBox.offsetWidth;
                 contentBox.classList.add("fade-in");
                 contentBox.innerHTML = dayData.content;
 
-                // 4. Update Tip
                 document.getElementById("tip-text").innerText = dayData.tip;
-                const tipBox = document.getElementById("daily-tip");
-                tipBox.className = `mt-8 p-4 rounded-lg text-sm border-l-4 ${currentOption === "A" ? "bg-slate-800 text-stone-200 border-slate-500" : "bg-amber-50 text-amber-900 border-amber-500"}`;
             }
 
-            // --- UTILS ---
+            // --- CHARTS ---
+            function initRadarChart() {
+                const ctx = document.getElementById("vibeRadarChart").getContext("2d");
+                radarChartInstance = new Chart(ctx, {
+                    type: "radar",
+                    data: {
+                        labels: ["Kenyamanan", "Kuliner", "Nightlife", "Modernitas", "Ramah Budget"],
+                        datasets: [
+                            {
+                                label: "SG + JB",
+                                data: [6, 7, 7, 9, 4],
+                                fill: true,
+                                backgroundColor: "rgba(148, 163, 184, 0.2)",
+                                borderColor: "rgb(148, 163, 184)",
+                            },
+                            {
+                                label: "KL + Melaka",
+                                data: [8, 9, 8, 7, 9],
+                                fill: true,
+                                backgroundColor: "rgba(245, 158, 11, 0.2)",
+                                borderColor: "rgb(245, 158, 11)",
+                            },
+                        ],
+                    },
+                    options: { maintainAspectRatio: false, scales: { r: { suggestedMin: 0, suggestedMax: 10, ticks: { display: false } } } },
+                });
+            }
+
+            function initBarChart() {
+                const ctx = document.getElementById("costBarChart").getContext("2d");
+                barChartInstance = new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: ["Makan", "Transport", "Oleh-oleh/Lainnya"],
+                        datasets: [{
+                            label: "Estimasi Biaya (IDR)",
+                            data: [750000, 350000, 600000],
+                            backgroundColor: ["#f59e0b", "#f59e0b", "#f59e0b"],
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+                updateBarChart();
+            }
+
+            function updateBarChart() {
+                if(!barChartInstance) return;
+                
+                let newData = [];
+                // Update grafik berdasarkan mode
+                if (currentOption === "A" && currentMode === "press") newData = [1200000, 400000, 600000]; // SG Press
+                else if (currentOption === "A" && currentMode === "ideal") newData = [2000000, 800000, 1500000]; // SG Ideal
+                else if (currentOption === "B" && currentMode === "press") newData = [900000, 300000, 600000]; // KL Press
+                else if (currentOption === "B" && currentMode === "ideal") newData = [2500000, 1000000, 1500000]; // KL Ideal
+
+                barChartInstance.data.datasets[0].data = newData;
+                const color = currentMode === 'press' ? '#10b981' : '#a855f7';
+                barChartInstance.data.datasets[0].backgroundColor = [color, color, color];
+                barChartInstance.update();
+            }
+
             function scrollToSection(id) {
-                document
-                    .getElementById(id)
-                    .scrollIntoView({ behavior: "smooth" });
+                document.getElementById(id).scrollIntoView({ behavior: "smooth" });
             }
         </script>
     </body>
