@@ -1,0 +1,960 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Bro-Trip Budget Planner: SG+JB vs KL+Melaka</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+            /* Chart Container Styling as per requirements */
+            .chart-container {
+                position: relative;
+                width: 100%;
+                max-width: 600px;
+                margin-left: auto;
+                margin-right: auto;
+                height: 300px;
+                max-height: 400px;
+            }
+            @media (min-width: 768px) {
+                .chart-container {
+                    height: 350px;
+                }
+            }
+
+            /* Custom Scrollbar for itinerary text areas */
+            .custom-scroll::-webkit-scrollbar {
+                width: 6px;
+            }
+            .custom-scroll::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+            .custom-scroll::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 4px;
+            }
+            .custom-scroll::-webkit-scrollbar-thumb:hover {
+                background: #94a3b8;
+            }
+
+            /* Transition effects */
+            .fade-in {
+                animation: fadeIn 0.5s ease-in-out;
+            }
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
+        <!-- Chosen Palette: Warm Neutrals (Stone) with Slate text and Amber/Teal accents for contrast -->
+        <!-- Application Structure Plan:
+         1. Header: Trip Profile & Context.
+         2. The Showdown (Dashboard): Interactive Radar Chart (Vibe Check) and Bar Chart (Cost Estimator) to immediately compare the two options visually.
+         3. Itinerary Explorer: A tabbed interface allowing users to switch between Option A and Option B, with a day-by-day slider to view specific activities without endless scrolling.
+         4. Survival Guide: Accordion-style practical tips for the specific "Bro-Trip" demographic.
+         This structure prioritizes decision-making (Battle Mode) followed by detailed planning (Itinerary).
+    -->
+        <!-- Visualization & Content Choices:
+         1. Radar Chart: To compare qualitative metrics (Comfort, Food, Nightlife, Budget Safety) -> Goal: Compare -> Chart.js.
+         2. Bar Chart: To compare estimated pocket money usage against the safe limit -> Goal: Inform/Budgeting -> Chart.js.
+         3. Interactive Cards: For Daily Itineraries to reduce text clutter -> Goal: Organize -> HTML/JS.
+         4. Dynamic Text: To update the "Verdict" based on user selection -> Goal: Inform -> JS.
+    -->
+        <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    </head>
+    <body class="bg-stone-100 text-slate-800 font-sans selection:bg-amber-200">
+        <!-- Navbar / Header -->
+        <header class="bg-slate-900 text-stone-100 shadow-lg sticky top-0 z-50">
+            <div
+                class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center"
+            >
+                <div>
+                    <h1
+                        class="text-2xl font-bold tracking-tight text-amber-500"
+                    >
+                        BRO-TRIP PLANNER
+                        <span
+                            class="text-xs text-stone-400 font-normal border border-stone-600 rounded px-2 py-0.5 ml-2"
+                            >BUDGET EDITION</span
+                        >
+                    </h1>
+                    <p class="text-xs text-stone-400 mt-1">
+                        3 Orang | 5 Hari | Budget 5-6 Juta (Sisa Saku 2-3 Juta)
+                    </p>
+                </div>
+                <nav class="mt-4 md:mt-0 space-x-4 text-sm font-medium">
+                    <button
+                        onclick="scrollToSection('showdown')"
+                        class="hover:text-amber-400 transition-colors"
+                    >
+                        Perbandingan
+                    </button>
+                    <button
+                        onclick="scrollToSection('itinerary')"
+                        class="hover:text-amber-400 transition-colors"
+                    >
+                        Itinerary Harian
+                    </button>
+                    <button
+                        onclick="scrollToSection('tips')"
+                        class="hover:text-amber-400 transition-colors"
+                    >
+                        Tips Hemat
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8 space-y-12">
+            <!-- Intro Section -->
+            <section class="text-center max-w-3xl mx-auto mb-12 fade-in">
+                <h2
+                    class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4"
+                >
+                    Pilih Medan Perang Kalian
+                </h2>
+                <p class="text-lg text-slate-600 leading-relaxed">
+                    Analisis mendalam untuk perjalanan 5 hari 4 malam dengan
+                    budget mahasiswa/fresh grad. Pilih antara bertahan hidup di
+                    kemewahan <strong>Singapura + Johor Bahru</strong> atau
+                    hidup bagai raja di <strong>Kuala Lumpur + Melaka</strong>.
+                </p>
+            </section>
+
+            <!-- SECTION 1: THE SHOWDOWN (Dashboard) -->
+            <section
+                id="showdown"
+                class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 md:p-8 scroll-mt-24"
+            >
+                <div class="mb-6 border-b border-stone-100 pb-4">
+                    <h3
+                        class="text-2xl font-bold text-slate-800 flex items-center gap-2"
+                    >
+                        <span class="text-amber-600 text-xl">VS</span>
+                        Head-to-Head Stats
+                    </h3>
+                    <p class="text-slate-500 text-sm mt-1">
+                        Visualisasi perbandingan kenyamanan, biaya, dan gaya
+                        liburan. Bagian ini membantu kalian memutuskan destinasi
+                        mana yang paling <em>worth it</em> dengan sisa uang saku
+                        Rp 2-3 Juta.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                    <!-- Radar Chart: Vibe Check -->
+                    <div class="flex flex-col">
+                        <h4
+                            class="text-center font-semibold text-slate-700 mb-4 uppercase tracking-wider text-sm"
+                        >
+                            Vibe & Comfort Level
+                        </h4>
+                        <div
+                            class="chart-container bg-stone-50 rounded-lg p-2 border border-stone-100"
+                        >
+                            <canvas id="vibeRadarChart"></canvas>
+                        </div>
+                        <div class="mt-4 text-xs text-center text-slate-500">
+                            *Skor 1-10 berdasarkan kecocokan budget & profil
+                            cowok 20an.
+                        </div>
+                    </div>
+
+                    <!-- Bar Chart: Cost Estimator -->
+                    <div class="flex flex-col">
+                        <h4
+                            class="text-center font-semibold text-slate-700 mb-4 uppercase tracking-wider text-sm"
+                        >
+                            Estimasi Pengeluaran Saku (Per Orang)
+                        </h4>
+                        <div
+                            class="chart-container bg-stone-50 rounded-lg p-2 border border-stone-100"
+                        >
+                            <canvas id="costBarChart"></canvas>
+                        </div>
+                        <div
+                            class="mt-4 p-3 bg-amber-50 border-l-4 border-amber-500 rounded text-xs text-slate-700"
+                        >
+                            <strong>Verdict:</strong> Opsi B (KL + Melaka)
+                            menyisakan ruang budget yang jauh lebih lega untuk
+                            belanja sneakers atau makan enak.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: ITINERARY EXPLORER -->
+            <section id="itinerary" class="scroll-mt-24">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-end mb-6"
+                >
+                    <div class="max-w-2xl">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-2">
+                            Jelajahi Rencana Perjalanan
+                        </h3>
+                        <p class="text-slate-600">
+                            Klik tombol opsi di bawah untuk melihat detail
+                            aktivitas harian. Kami telah menyusun alur yang
+                            memaksimalkan pengalaman gratisan dan kuliner murah.
+                        </p>
+                    </div>
+
+                    <!-- Option Toggles -->
+                    <div class="flex bg-stone-200 p-1 rounded-lg mt-4 md:mt-0">
+                        <button
+                            id="btn-opt-a"
+                            onclick="switchOption('A')"
+                            class="px-6 py-2 rounded-md text-sm font-bold transition-all bg-white text-slate-900 shadow-sm"
+                        >
+                            Opsi A: SG + JB
+                        </button>
+                        <button
+                            id="btn-opt-b"
+                            onclick="switchOption('B')"
+                            class="px-6 py-2 rounded-md text-sm font-bold transition-all text-slate-600 hover:text-slate-900"
+                        >
+                            Opsi B: KL + Melaka
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Itinerary Display Container -->
+                <div
+                    class="bg-white rounded-xl shadow-lg border border-stone-200 overflow-hidden min-h-[500px] flex flex-col md:flex-row"
+                >
+                    <!-- Day Navigator (Sidebar on Desktop, Top on Mobile) -->
+                    <div
+                        class="w-full md:w-1/4 bg-slate-50 border-b md:border-b-0 md:border-r border-stone-200 flex md:flex-col overflow-x-auto md:overflow-x-visible"
+                    >
+                        <div
+                            class="p-4 bg-slate-100 border-b border-stone-200 hidden md:block"
+                        >
+                            <span
+                                class="text-xs font-bold text-slate-400 uppercase"
+                                >Pilih Hari</span
+                            >
+                        </div>
+                        <!-- Generated via JS -->
+                        <div
+                            id="day-nav-container"
+                            class="flex md:flex-col w-full"
+                        >
+                            <!-- Buttons injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Content Area -->
+                    <div
+                        class="w-full md:w-3/4 p-6 md:p-8 flex flex-col relative"
+                    >
+                        <!-- Dynamic Header -->
+                        <div
+                            class="flex justify-between items-start mb-6 border-b border-stone-100 pb-4"
+                        >
+                            <div>
+                                <span
+                                    id="itinerary-tag"
+                                    class="inline-block px-2 py-1 rounded text-xs font-bold bg-amber-100 text-amber-800 mb-2"
+                                    >MODE HEMAT ABIS</span
+                                >
+                                <h2
+                                    id="itinerary-title"
+                                    class="text-2xl font-bold text-slate-900"
+                                >
+                                    Hari 1: Singapore (Jalan Kaki & Foto)
+                                </h2>
+                            </div>
+                            <div class="text-right hidden sm:block">
+                                <span
+                                    class="block text-xs text-slate-400 uppercase"
+                                    >Fokus Utama</span
+                                >
+                                <span
+                                    id="itinerary-focus"
+                                    class="font-medium text-slate-700"
+                                    >Wisata Gratisan</span
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Body -->
+                        <div
+                            id="itinerary-content"
+                            class="flex-grow space-y-6 text-slate-700 custom-scroll overflow-y-auto max-h-[600px] pr-2 fade-in"
+                        >
+                            <!-- Content injected here -->
+                        </div>
+
+                        <!-- Pro-Tip Box -->
+                        <div
+                            id="daily-tip"
+                            class="mt-8 p-4 bg-slate-800 text-stone-200 rounded-lg text-sm border-l-4 border-amber-500"
+                        >
+                            <span class="font-bold text-amber-400 mr-2"
+                                >PRO TIP:</span
+                            >
+                            <span id="tip-text"
+                                >Makan siang di Staff Canteen Changi, jauh lebih
+                                murah!</span
+                            >
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: TIPS & TRICKS -->
+            <section
+                id="tips"
+                class="grid grid-cols-1 md:grid-cols-3 gap-6 scroll-mt-24"
+            >
+                <div class="md:col-span-3 mb-4">
+                    <h3 class="text-2xl font-bold text-slate-800">
+                        Tips "Bro-Trip" Irit
+                    </h3>
+                    <p class="text-slate-600">
+                        Panduan survival untuk menjaga cashflow tetap aman.
+                    </p>
+                </div>
+
+                <!-- Card 1 -->
+                <div
+                    class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow"
+                >
+                    <div class="text-3xl mb-3">💧</div>
+                    <h4 class="font-bold text-slate-900 mb-2">
+                        Air Minum Strategis
+                    </h4>
+                    <p class="text-sm text-slate-600">
+                        Di SG air mineral itu "liquid gold" (SGD 2-3). Bawa
+                        botol kosong dari Jakarta, isi ulang di water fountain
+                        bandara, taman, atau mall. Di KL/Melaka aman, murah
+                        meriah.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div
+                    class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow"
+                >
+                    <div class="text-3xl mb-3">🚌</div>
+                    <h4 class="font-bold text-slate-900 mb-2">
+                        Transport Hacks
+                    </h4>
+                    <p class="text-sm text-slate-600">
+                        <strong>SG:</strong> Wajib Contactless Bank Indo
+                        (Jenius/Jago/dll) buat tap MRT biar ga beli kartu mahal.
+                        <br />
+                        <strong>KL:</strong> Cari Bus "GoKL" (Pink/Ungu). Itu
+                        gratis keliling Bukit Bintang - KLCC.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div
+                    class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow"
+                >
+                    <div class="text-3xl mb-3">📶</div>
+                    <h4 class="font-bold text-slate-900 mb-2">
+                        Koneksi & Hotel
+                    </h4>
+                    <p class="text-sm text-slate-600">
+                        Beli sim card lokal (Tunetalk/Singtel) satu aja terus
+                        tethering kalau mau super irit. Hotel cari "Triple Room"
+                        atau Hostel sekamar ber-3. Jauh lebih hemat dibanding
+                        sewa 2 kamar.
+                    </p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="bg-slate-900 text-stone-400 py-8 mt-12">
+            <div class="container mx-auto px-4 text-center">
+                <p class="text-sm">
+                    Generated for Budget Travelers | Source: Itinerary Budget
+                    Edition
+                </p>
+                <p class="text-xs mt-2 text-stone-600">
+                    Disclaimer: Harga dapat berubah sewaktu-waktu. Selalu cek
+                    rate kurs terbaru.
+                </p>
+            </div>
+        </footer>
+
+        <!-- JavaScript Logic -->
+        <script>
+            // --- DATA STORAGE ---
+            // Storing all report content in structured objects
+            const itineraryData = {
+                A: {
+                    name: "Opsi A: SG + JB",
+                    tag: "MODE HEMAT ABIS",
+                    desc: "Warning: Karena sisa uang saku mepet (Rp 2-3 jt), di Singapura kita fokus wisata gratisan dan makan di Hawker Center. Di Johor Bahru baru bisa agak foya-foya.",
+                    days: [
+                        {
+                            title: "Hari 1: Singapore (Jalan Kaki & Foto)",
+                            focus: "Landmark Ikonik Gratis",
+                            content: `
+                            <ul class="list-none space-y-4">
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
+                                    <div>
+                                        <p class="font-semibold">Tiba di Changi Airport</p>
+                                        <p class="text-sm">Langsung cari <strong>Staff Canteen</strong>. Jangan makan di resto mall bandara kalau mau hemat. Tanya petugas arahnya.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Sore</span>
+                                    <div>
+                                        <p class="font-semibold">Check-in Hotel/Hostel</p>
+                                        <p class="text-sm">Area Geylang atau Lavender biasanya paling bersahabat di kantong.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
+                                    <div>
+                                        <p class="font-semibold">Marina Bay Sands Area (Gratis)</p>
+                                        <p class="text-sm mb-1">1. Nonton <strong>Spectra Light Show</strong> (depan MBS) jam 8/9 malam.</p>
+                                        <p class="text-sm">2. Jalan ke <strong>Gardens by the Bay</strong> nonton <strong>Garden Rhapsody</strong> jam 7.45/8.45 malam. Cukup keliling taman luar, skip Cloud Forest (mahal).</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        `,
+                            tip: "Bawa botol minum kosong, isi di Changi sebelum keluar!",
+                        },
+                        {
+                            title: "Hari 2: Sentosa & Chinatown",
+                            focus: "Wisata Tanpa Tiket",
+                            content: `
+                            <ul class="list-none space-y-4">
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
+                                    <div>
+                                        <p class="font-semibold">Sarapan Legendaris</p>
+                                        <p class="text-sm">Ke <strong>Maxwell Food Centre</strong>. Pesen Tian Tian Chicken Rice. Satu porsi bisa sharing kalau mau super irit.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
+                                    <div>
+                                        <p class="font-semibold">Sentosa Island (Jalan Kaki)</p>
+                                        <p class="text-sm">Lewat <strong>Sentosa Boardwalk</strong> dari VivoCity (Gratis/Murah). Foto di bola dunia Universal Studios (luar aja). Lanjut nongkrong di Siloso Beach bawa minum dari 7-Eleven.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-slate-800 w-16 shrink-0">Sore</span>
+                                    <div>
+                                        <p class="font-semibold">Chinatown & Souvenir</p>
+                                        <p class="text-sm">Kunjungi Buddha Tooth Relic Temple (Gratis). Cari gantungan kunci 3 pcs $10 buat syarat oleh-oleh.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
+                                    <div>
+                                        <p class="font-semibold">Clarke Quay Hangout</p>
+                                        <p class="text-sm">Beli minum di minimarket, duduk di jembatan liat orang lewat. Ini kultur hemat anak muda lokal.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        `,
+                            tip: "Jangan tergoda naik Monorail ke Sentosa, jalan kaki di Boardwalk view-nya bagus dan sehat.",
+                        },
+                        {
+                            title: "Hari 3: Bye Mahal, Hello Murah (Ke JB)",
+                            focus: "Lintas Negara",
+                            content: `
+                            <ul class="list-none space-y-4">
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
+                                    <div>
+                                        <p class="font-semibold">Perjalanan ke Johor Bahru</p>
+                                        <p class="text-sm">Naik Bus 170 atau Causeway Link dari Queen Street Terminal (SGD 2.5 - 4). Siap-siap mental antri imigrasi.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
+                                    <div>
+                                        <p class="font-semibold">Tiba di JB (Surga Murah)</p>
+                                        <p class="text-sm">Makan besar di Nasi Kandar area JB Sentral. Check-in hotel.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-slate-800 w-16 shrink-0">Sore</span>
+                                    <div>
+                                        <p class="font-semibold">Heritage Walk</p>
+                                        <p class="text-sm">Jalan Tan Hiok Nee. Foto-foto vibe kota tua yang estetik.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
+                                    <div>
+                                        <p class="font-semibold">Pasar Karat (Night Market)</p>
+                                        <p class="text-sm">Thrifting baju, sneakers, aksesoris cowok. Makan seafood pinggir jalan harga kaki lima.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        `,
+                            tip: "Siapkan passport dan fisik prima buat antrian imigrasi.",
+                        },
+                        {
+                            title: "Hari 4: Have Fun di JB",
+                            focus: "Santai & Belanja",
+                            content: `
+                            <ul class="list-none space-y-4">
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
+                                    <div>
+                                        <p class="font-semibold">Sarapan Lokal</p>
+                                        <p class="text-sm">Roti Canai + Teh Tarik.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
+                                    <div>
+                                        <p class="font-semibold">Pilih Opsi:</p>
+                                        <p class="text-sm mb-1">A. <strong>Danga Bay</strong>: Pantai buatan, masuk gratis.</p>
+                                        <p class="text-sm">B. <strong>Johor Premium Outlets (JPO)</strong>: Naik bus dari JB Sentral. Cari diskon Nike/Adidas.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
+                                    <div>
+                                        <p class="font-semibold">Mamak Stall Culture</p>
+                                        <p class="text-sm">Cari warung 24 jam. Pesen Mie Goreng Mamak. Nongkrong sampe pagi ngobrolin hidup.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        `,
+                            tip: "Transport di JB paling enak pakai Grab (bagi 3 orang murah).",
+                        },
+                        {
+                            title: "Hari 5: Pulang",
+                            focus: "Oleh-oleh & Airport",
+                            content: `
+                            <ul class="list-none space-y-4">
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
+                                    <div>
+                                        <p class="font-semibold">Belanja Terakhir</p>
+                                        <p class="text-sm">Beryl's Chocolate atau supermarket biasa.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
+                                    <div>
+                                        <p class="font-semibold">OTW Bandara</p>
+                                        <p class="text-sm">Hati-hati kalau flight dari Changi, spare waktu 4-5 jam buat nyebrang perbatasan lagi.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        `,
+                            tip: "Cek traffic imigrasi lewat aplikasi sebelum berangkat ke perbatasan.",
+                        },
+                    ],
+                },
+                B: {
+                    name: "Opsi B: KL + Melaka",
+                    tag: "RAJA JALANAN",
+                    desc: "Verdict: Paling pas buat budget kalian. Bisa makan enak terus, nongkrong lama, dan transport murah.",
+                    days: [
+                        {
+                            title: "Hari 1: KL City Attack",
+                            focus: "City Center & Landmark",
+                            content: `
+                            <ul class="list-none space-y-4">
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
+                                    <div>
+                                        <p class="font-semibold">Tiba di KLIA</p>
+                                        <p class="text-sm">Naik Bus ke KL Sentral (RM 12-15), jauh lebih murah dari kereta ekspres.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Sore</span>
+                                    <div>
+                                        <p class="font-semibold">Bukit Bintang</p>
+                                        <p class="text-sm">Check-in hotel area sini. Jalan kaki ke Pavilion Mall, cuci mata liat lifestyle KL.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
+                                    <div>
+                                        <p class="font-semibold">KLCC Petronas Towers</p>
+                                        <p class="text-sm">Foto spot wajib saat nyala. Makan di <strong>Jalan Sahabat</strong> atau <strong>Nasi Kandar Pelita</strong> dekat KLCC (RM 15-20 kenyang). Hindari Jalan Alor (Mahal).</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        `,
+                            tip: "Gunakan Bus Gratis 'GoKL' warna pink/ungu untuk keliling area pusat kota.",
+                        },
+                        {
+                            title: "Hari 2: Budaya & Gaul",
+                            focus: "Culture & Nightlife",
+                            content: `
+                            <ul class="list-none space-y-4">
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
+                                    <div>
+                                        <p class="font-semibold">Batu Caves</p>
+                                        <p class="text-sm">Naik KTM Komuter (murah). Foto di tangga warna-warni & patung emas. Gratis masuk.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
+                                    <div>
+                                        <p class="font-semibold">Pasar Seni & Petaling Street</p>
+                                        <p class="text-sm">Cari baju/kaos murah di Central Market. Jalan kaki ke Chinatown (Petaling Street).</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-slate-800 w-16 shrink-0">Sore</span>
+                                    <div>
+                                        <p class="font-semibold">River of Life</p>
+                                        <p class="text-sm">Dekat Masjid Jamek. Keren buat foto pas sore/malam ada kabut buatan.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
+                                    <div>
+                                        <p class="font-semibold">Changkat / Kampung Baru</p>
+                                        <p class="text-sm">Pilih: Nightlife di Changkat (Bar/Pub) atau Wisata Kuliner Nasi Lemak Wanjo di Kampung Baru.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        `,
+                            tip: "Batu Caves panas banget, datang sepagi mungkin.",
+                        },
+                        {
+                            title: "Hari 3: Roadtrip ke Melaka",
+                            focus: "Historical City",
+                            content: `
+                            <ul class="list-none space-y-4">
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
+                                    <div>
+                                        <p class="font-semibold">Bus ke Melaka</p>
+                                        <p class="text-sm">Ke terminal TBS. Bus ke Melaka cuma RM 10-15. Nyaman dan on-time.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
+                                    <div>
+                                        <p class="font-semibold">Melaka City</p>
+                                        <p class="text-sm">Check-in sekitar Jonker Walk. Sewa sepeda atau jalan kaki.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-slate-800 w-16 shrink-0">Sore</span>
+                                    <div>
+                                        <p class="font-semibold">Red Square</p>
+                                        <p class="text-sm">Stadthuys, A Famosa, naik bukit St Paul (View gratis).</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
+                                    <div>
+                                        <p class="font-semibold">Jonker Walk Night Market</p>
+                                        <p class="text-sm">Wajib Jumat-Minggu. Jajan street food aneh-aneh (telur puyuh, oyster, dimsum). Murah!</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        `,
+                            tip: "Booking tiket bus via online (RedBus/Easybook) biar tenang.",
+                        },
+                        {
+                            title: "Hari 4: Santai & Balik KL",
+                            focus: "Sightseeing & Shopping",
+                            content: `
+                            <ul class="list-none space-y-4">
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
+                                    <div>
+                                        <p class="font-semibold">Masjid Selat Melaka</p>
+                                        <p class="text-sm">Sarapan Cendol Durian dulu, terus naik Grab bertiga ke Floating Mosque.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
+                                    <div>
+                                        <p class="font-semibold">Balik ke KL</p>
+                                        <p class="text-sm">Bus dari Melaka Sentral ke TBS.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-slate-800 w-16 shrink-0">Malam</span>
+                                    <div>
+                                        <p class="font-semibold">Belanja Oleh-oleh</p>
+                                        <p class="text-sm">Ke supermarket Giant/Mydin atau Beryl's. Harga coklat jauh lebih murah daripada di bandara.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        `,
+                            tip: "Mydin supermarket adalah tempat rahasia beli oleh-oleh murah.",
+                        },
+                        {
+                            title: "Hari 5: Putrajaya (Bonus)",
+                            focus: "Beautiful Government City",
+                            content: `
+                            <ul class="list-none space-y-4">
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Pagi</span>
+                                    <div>
+                                        <p class="font-semibold">Stopover Putrajaya</p>
+                                        <p class="text-sm">Naik KLIA Transit turun Putrajaya Sentral. Sewa Grab keliling liat Masjid Pink.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 w-16 shrink-0">Siang</span>
+                                    <div>
+                                        <p class="font-semibold">Flight Pulang</p>
+                                        <p class="text-sm">Makan siang di food court bandara (Quizinn) harga masih oke.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        `,
+                            tip: "Putrajaya sangat instagramable buat foto grup cowok-cowok.",
+                        },
+                    ],
+                },
+            };
+
+            // Global State
+            let currentOption = "B"; // Default to B (The Winner)
+            let currentDay = 0;
+
+            // --- CHART GENERATION ---
+            document.addEventListener("DOMContentLoaded", () => {
+                initRadarChart();
+                initBarChart();
+                renderItinerary();
+            });
+
+            function initRadarChart() {
+                const ctx = document
+                    .getElementById("vibeRadarChart")
+                    .getContext("2d");
+                new Chart(ctx, {
+                    type: "radar",
+                    data: {
+                        labels: [
+                            "Kenyamanan",
+                            "Kuliner",
+                            "Nightlife",
+                            "Modernitas",
+                            "Ramah Budget",
+                        ],
+                        datasets: [
+                            {
+                                label: "Opsi A: SG + JB",
+                                data: [5, 7, 6, 9, 5],
+                                fill: true,
+                                backgroundColor: "rgba(148, 163, 184, 0.2)", // Slate
+                                borderColor: "rgb(148, 163, 184)",
+                                pointBackgroundColor: "rgb(148, 163, 184)",
+                                pointBorderColor: "#fff",
+                                pointHoverBackgroundColor: "#fff",
+                                pointHoverBorderColor: "rgb(148, 163, 184)",
+                            },
+                            {
+                                label: "Opsi B: KL + Melaka",
+                                data: [8, 9, 8, 7, 9],
+                                fill: true,
+                                backgroundColor: "rgba(245, 158, 11, 0.2)", // Amber
+                                borderColor: "rgb(245, 158, 11)",
+                                pointBackgroundColor: "rgb(245, 158, 11)",
+                                pointBorderColor: "#fff",
+                                pointHoverBackgroundColor: "#fff",
+                                pointHoverBorderColor: "rgb(245, 158, 11)",
+                            },
+                        ],
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: { color: "#e5e7eb" },
+                                grid: { color: "#e5e7eb" },
+                                suggestedMin: 0,
+                                suggestedMax: 10,
+                                ticks: { display: false },
+                            },
+                        },
+                        plugins: {
+                            legend: { position: "bottom" },
+                        },
+                    },
+                });
+            }
+
+            function initBarChart() {
+                const ctx = document
+                    .getElementById("costBarChart")
+                    .getContext("2d");
+                new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: ["Makan", "Transport", "Oleh-oleh/Lainnya"],
+                        datasets: [
+                            {
+                                label: "Opsi A (SG+JB) - IDR",
+                                data: [900000, 450000, 600000], // Approx breakdown
+                                backgroundColor: "#94a3b8",
+                                stack: "Stack 0",
+                            },
+                            {
+                                label: "Opsi B (KL+Melaka) - IDR",
+                                data: [750000, 350000, 600000], // Approx breakdown
+                                backgroundColor: "#f59e0b",
+                                stack: "Stack 1",
+                            },
+                        ],
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        let label = context.dataset.label || "";
+                                        if (label) {
+                                            label += ": ";
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += new Intl.NumberFormat(
+                                                "id-ID",
+                                                {
+                                                    style: "currency",
+                                                    currency: "IDR",
+                                                    maximumSignificantDigits: 3,
+                                                },
+                                            ).format(context.parsed.y);
+                                        }
+                                        return label;
+                                    },
+                                },
+                            },
+                            legend: { position: "bottom" },
+                            title: {
+                                display: true,
+                                text: "Sisa Uang Saku Max: Rp 2.500.000",
+                            },
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: "#f5f5f4" },
+                            },
+                            x: {
+                                grid: { display: false },
+                            },
+                        },
+                    },
+                });
+            }
+
+            // --- INTERACTION LOGIC ---
+
+            function switchOption(option) {
+                currentOption = option;
+                currentDay = 0; // Reset to day 1 on switch
+
+                // Toggle Button Styles
+                const btnA = document.getElementById("btn-opt-a");
+                const btnB = document.getElementById("btn-opt-b");
+
+                if (option === "A") {
+                    btnA.className =
+                        "px-6 py-2 rounded-md text-sm font-bold transition-all bg-white text-slate-900 shadow-sm ring-1 ring-slate-200";
+                    btnB.className =
+                        "px-6 py-2 rounded-md text-sm font-bold transition-all text-slate-500 hover:text-slate-900";
+                } else {
+                    btnA.className =
+                        "px-6 py-2 rounded-md text-sm font-bold transition-all text-slate-500 hover:text-slate-900";
+                    btnB.className =
+                        "px-6 py-2 rounded-md text-sm font-bold transition-all bg-white text-amber-600 shadow-sm ring-1 ring-amber-200";
+                }
+
+                renderItinerary();
+            }
+
+            function switchDay(dayIndex) {
+                currentDay = dayIndex;
+                renderItinerary();
+            }
+
+            function renderItinerary() {
+                const data = itineraryData[currentOption];
+                const dayData = data.days[currentDay];
+
+                // 1. Render Nav Buttons
+                const navContainer =
+                    document.getElementById("day-nav-container");
+                navContainer.innerHTML = "";
+                data.days.forEach((day, index) => {
+                    const btn = document.createElement("button");
+                    const isActive = index === currentDay;
+
+                    let baseClasses =
+                        "w-full text-left p-4 text-sm font-medium border-b border-slate-100 transition-colors flex justify-between items-center";
+                    let activeClasses = isActive
+                        ? currentOption === "A"
+                            ? "bg-white text-slate-900 border-l-4 border-l-slate-900"
+                            : "bg-white text-amber-600 border-l-4 border-l-amber-500"
+                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-700";
+
+                    // Mobile adjustment (horizontal flex)
+                    if (window.innerWidth < 768) {
+                        baseClasses =
+                            "flex-shrink-0 w-auto p-3 text-xs border-r border-stone-200";
+                        activeClasses = isActive
+                            ? currentOption === "A"
+                                ? "bg-white text-slate-900 border-b-4 border-b-slate-900"
+                                : "bg-white text-amber-600 border-b-4 border-b-amber-500"
+                            : "text-slate-500 bg-stone-50";
+                    }
+
+                    btn.className = `${baseClasses} ${activeClasses}`;
+                    btn.onclick = () => switchDay(index);
+                    btn.innerHTML = `<span>Hari ${index + 1}</span> ${isActive ? "<span>👉</span>" : ""}`;
+                    navContainer.appendChild(btn);
+                });
+
+                // 2. Update Header Info
+                const tag = document.getElementById("itinerary-tag");
+                tag.innerText = data.tag;
+                tag.className = `inline-block px-2 py-1 rounded text-xs font-bold mb-2 ${currentOption === "A" ? "bg-slate-200 text-slate-700" : "bg-amber-100 text-amber-800"}`;
+
+                document.getElementById("itinerary-title").innerText =
+                    dayData.title;
+                document.getElementById("itinerary-focus").innerText =
+                    dayData.focus;
+
+                // 3. Update Content Body (with simple animation reset)
+                const contentBox = document.getElementById("itinerary-content");
+                contentBox.classList.remove("fade-in");
+                void contentBox.offsetWidth; // trigger reflow
+                contentBox.classList.add("fade-in");
+                contentBox.innerHTML = dayData.content;
+
+                // 4. Update Tip
+                document.getElementById("tip-text").innerText = dayData.tip;
+                const tipBox = document.getElementById("daily-tip");
+                tipBox.className = `mt-8 p-4 rounded-lg text-sm border-l-4 ${currentOption === "A" ? "bg-slate-800 text-stone-200 border-slate-500" : "bg-amber-50 text-amber-900 border-amber-500"}`;
+            }
+
+            // --- UTILS ---
+            function scrollToSection(id) {
+                document
+                    .getElementById(id)
+                    .scrollIntoView({ behavior: "smooth" });
+            }
+        </script>
+    </body>
+</html>
