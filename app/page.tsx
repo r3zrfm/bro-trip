@@ -28,7 +28,7 @@ ChartJS.register(
   BarElement
 );
 
-const costLabels = ["Makan", "Transport", "Oleh-oleh/Lainnya"] as const;
+const costLabels = ["Makan", "Transport", "Oleh-oleh/Lainnya"];
 
 const costByOptionMode = {
   A: {
@@ -84,11 +84,11 @@ export default function Home() {
   const barData = useMemo(() => {
     const color = currentMode === "press" ? "#10b981" : "#a855f7";
     return {
-      labels: costLabels,
+      labels: [...costLabels],
       datasets: [
         {
           label: "Estimasi Biaya (IDR)",
-          data: costByOptionMode[currentOption][currentMode],
+          data: [...costByOptionMode[currentOption][currentMode]],
           backgroundColor: [color, color, color],
         },
       ],
