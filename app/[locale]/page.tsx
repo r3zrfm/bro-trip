@@ -17,6 +17,7 @@ import {
   Tooltip,
 } from "chart.js";
 import { itineraryData, type BudgetMode, type TripOption } from "../data/itinerary";
+import { itineraryDataEn } from "../data/itinerary.en";
 import { activityLookups } from "../data/activityInfo";
 
 ChartJS.register(
@@ -38,7 +39,7 @@ const copyByLocale = {
     headerSub: "3 Orang | 5 Hari | Mode: Hemat vs Sultan",
     navCompare: "Perbandingan",
     navItinerary: "Itinerary Harian",
-    navTips: "Tips Hemat",
+    navTips: "Budget Tips",
     heroTitle: "Pilih Medan Perang Kalian",
     heroBodyLead:
       "Analisis mendalam untuk perjalanan Mei 2026. Pilih destinasi dan sesuaikan dengan ketebalan dompet:",
@@ -87,14 +88,14 @@ const copyByLocale = {
   en: {
     headerTitle: "BRO-TRIP PLANNER",
     headerEdition: "2026 EDITION",
-    headerSub: "3 People | 5 Days | Mode: Hemat vs Sultan",
+    headerSub: "3 People | 5 Days | Budget: Saver vs Luxury",
     navCompare: "Comparison",
     navItinerary: "Daily Itinerary",
     navTips: "Budget Tips",
     heroTitle: "Choose Your Battlefield",
     heroBodyLead:
       "A deep dive for the May 2026 trip. Pick a destination and match it to your wallet:",
-    heroBodyHemat: "Mode Hemat (Rp 2.5m)",
+    heroBodyHemat: "Saver Budget (Rp 2.5m)",
     heroBodyMid: "for survivors, or",
     heroBodyIdeal: "Mode Ideal (Rp 3.5m++)",
     heroBodyTail: "if you want more comfort.",
@@ -106,13 +107,13 @@ const copyByLocale = {
     pocketLabel: "Pocket Spending Estimate (Per Person)",
     noteLabel: "Note",
     noteBody:
-      "The cost chart updates automatically when you switch the budget mode below (Hemat vs Sultan).",
+      "The cost chart updates automatically when you switch the budget mode below (Saver vs Luxury).",
     itineraryTitle: "Explore the Trip Plan",
     itineraryLegendMorning: "Morning (06-12)",
     itineraryLegendNoon: "Noon/Afternoon (12-18)",
     itineraryLegendNight: "Night (18-00)",
-    modeHemat: "Mode Hemat (2.5jt)",
-    modeSultan: "Mode Sultan (4jt++)",
+    modeHemat: "Budget: Saver (2.5m)",
+    modeSultan: "Budget: Luxury (4m++)",
     optionA: "SG + JB",
     optionB: "KL + Melaka",
     chooseDay: "Choose Day",
@@ -183,7 +184,6 @@ type PopoverState = {
   top: number;
   left: number;
 };
-
 const parseActivities = (html: string): ParsedActivity[] => {
   if (typeof window === "undefined") {
     return [];
@@ -252,7 +252,8 @@ export default function Home() {
   const sgColor = currentMode === "press" ? "#10b981" : "#a855f7";
   const klColor = currentMode === "press" ? "#f59e0b" : "#0ea5e9";
 
-  const optionData = itineraryData[currentOption];
+  const dataByLocale = locale === "en" ? itineraryDataEn : itineraryData;
+  const optionData = dataByLocale[currentOption];
   const modeData = optionData[currentMode];
   const dayData = modeData.days[currentDay];
   const activities = useMemo(
