@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
 "use client";
-
+import { redirect } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Bar, Radar } from "react-chartjs-2";
 import type { ChartData } from "chart.js";
