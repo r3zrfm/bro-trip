@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Bar, Radar } from "react-chartjs-2";
+import type { ChartData } from "chart.js";
 import {
   BarElement,
   CategoryScale,
@@ -84,18 +85,18 @@ export default function Home() {
   const modeData = optionData[currentMode];
   const dayData = modeData.days[currentDay];
 
-  const barData = useMemo(() => {
+  const barData = useMemo<ChartData<"bar", number[], string>>(() => {
     return {
       labels: [...costLabels],
       datasets: [
         {
           label: "SG + JB",
-          data: [...costByOptionMode.A[currentMode]],
+          data: [...costByOptionMode.A[currentMode]] as number[],
           backgroundColor: [sgColor, sgColor, sgColor],
         },
         {
           label: "KL + Melaka",
-          data: [...costByOptionMode.B[currentMode]],
+          data: [...costByOptionMode.B[currentMode]] as number[],
           backgroundColor: [klColor, klColor, klColor],
         },
       ],
