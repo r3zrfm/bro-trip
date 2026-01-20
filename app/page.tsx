@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Bar, Radar } from "react-chartjs-2";
+import type { ChartData } from "chart.js";
 import {
   BarElement,
   CategoryScale,
@@ -15,6 +16,7 @@ import {
   Tooltip,
 } from "chart.js";
 import { itineraryData, type BudgetMode, type TripOption } from "./data/itinerary";
+import { activityLookups } from "./data/activityInfo";
 
 ChartJS.register(
   RadialLinearScale,
@@ -72,10 +74,87 @@ const barOptions = {
   scales: { y: { beginAtZero: true } },
 };
 
+const PLACEHOLDER_PLACE_IMAGE =
+  "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=900&q=80";
+const PLACEHOLDER_FOOD_IMAGE =
+  "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80";
+
+type ParsedActivity = {
+  time: string;
+  timeClass: string;
+  title: string;
+  detail: string;
+};
+
+type PopoverState = {
+  id: string;
+  activity: ParsedActivity;
+  imageUrl: string;
+  top: number;
+  left: number;
+};
+
+const parseActivities = (html: string): ParsedActivity[] => {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const items = Array.from(doc.querySelectorAll("li"));
+
+  return items.map((item) => {
+    const timeEl = item.querySelector("span");
+    const textBlocks = item.querySelectorAll("p");
+    const titleEl = textBlocks[0];
+    const detailEl = textBlocks[1];
+
+    return {
+      time: timeEl?.textContent?.trim() ?? "",
+      timeClass: timeEl?.getAttribute("class") ?? "font-bold text-slate-500 w-16 shrink-0",
+      title: titleEl?.textContent?.trim() ?? "",
+      detail: detailEl?.textContent?.trim() ?? "",
+    };
+  });
+};
+
+const isMealActivity = (activity: ParsedActivity) => {
+  const text = `${activity.title} ${activity.detail}`.toLowerCase();
+  const mealKeywords = ["sarapan", "breakfast", "lunch", "dinner", "makan", "roti"];
+  return mealKeywords.some((keyword) => text.includes(keyword));
+};
+
+const activityLookupIndex = [...activityLookups].sort(
+  (a, b) => b.keyword.length - a.keyword.length
+);
+
+const stripCosts = (text: string) =>
+  text
+    .replace(/\([^)]*(SGD|RM)[^)]*\)/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+
+const getFallbackAddress = (activity: ParsedActivity) => {
+  const cleaned = stripCosts(activity.detail);
+  if (!cleaned) {
+    return "Lokasi fleksibel";
+  }
+  return cleaned;
+};
+
+const getLookupInfo = (activity: ParsedActivity, option: TripOption) => {
+  const text = `${activity.title} ${activity.detail}`.toLowerCase();
+  return activityLookupIndex.find(
+    (entry) =>
+      entry.option === option && text.includes(entry.keyword.toLowerCase())
+  );
+};
+
 export default function Home() {
   const [currentOption, setCurrentOption] = useState<TripOption>("B");
   const [currentMode, setCurrentMode] = useState<BudgetMode>("press");
   const [currentDay, setCurrentDay] = useState(0);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [activePopover, setActivePopover] = useState<PopoverState | null>(null);
 
   const sgColor = currentMode === "press" ? "#10b981" : "#a855f7";
   const klColor = currentMode === "press" ? "#f59e0b" : "#0ea5e9";
@@ -83,19 +162,23 @@ export default function Home() {
   const optionData = itineraryData[currentOption];
   const modeData = optionData[currentMode];
   const dayData = modeData.days[currentDay];
+  const activities = useMemo(
+    () => (isHydrated ? parseActivities(dayData.content) : []),
+    [dayData.content, isHydrated]
+  );
 
-  const barData = useMemo(() => {
+  const barData = useMemo<ChartData<"bar", number[], string>>(() => {
     return {
       labels: [...costLabels],
       datasets: [
         {
           label: "SG + JB",
-          data: [...costByOptionMode.A[currentMode]],
+          data: [...costByOptionMode.A[currentMode]] as number[],
           backgroundColor: [sgColor, sgColor, sgColor],
         },
         {
           label: "KL + Melaka",
-          data: [...costByOptionMode.B[currentMode]],
+          data: [...costByOptionMode.B[currentMode]] as number[],
           backgroundColor: [klColor, klColor, klColor],
         },
       ],
@@ -106,6 +189,25 @@ export default function Home() {
     currentMode === "press"
       ? "inline-block px-2 py-1 rounded text-xs font-bold bg-emerald-100 text-emerald-800 mb-2"
       : "inline-block px-2 py-1 rounded text-xs font-bold bg-purple-100 text-purple-800 mb-2";
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  const openPopover = (
+    event: React.MouseEvent<HTMLElement>,
+    activityId: string,
+    activity: ParsedActivity,
+    imageUrl: string
+  ) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const width = 260;
+    const offset = 10;
+    const left = Math.min(rect.left + 64, window.innerWidth - width - 16);
+    const top = rect.bottom + offset;
+
+    setActivePopover({ id: activityId, activity, imageUrl, top, left });
+  };
 
   return (
     <>
@@ -336,8 +438,96 @@ export default function Home() {
                 key={`${currentOption}-${currentMode}-${currentDay}`}
                 id="itinerary-content"
                 className="flex-grow space-y-6 text-slate-700 custom-scroll overflow-y-auto max-h-[600px] pr-2 fade-in"
-                dangerouslySetInnerHTML={{ __html: dayData.content }}
-              />
+                onScroll={() => setActivePopover(null)}
+              >
+                {!isHydrated ? (
+                  <div dangerouslySetInnerHTML={{ __html: dayData.content }} />
+                ) : (
+                  <ul className="list-none space-y-4">
+                    {activities.map((activity, index) => {
+                      const activityId = `${currentOption}-${currentMode}-${currentDay}-${index}`;
+                      const lookup = getLookupInfo(activity, currentOption);
+                      const useFoodImage = isMealActivity(activity);
+                      const imageUrl =
+                        lookup?.imageUrl ??
+                        (useFoodImage ? PLACEHOLDER_FOOD_IMAGE : PLACEHOLDER_PLACE_IMAGE);
+                      const infoTitle = lookup?.title ?? activity.title;
+                      const infoAddress = lookup?.address || getFallbackAddress(activity);
+
+                      return (
+                        <li
+                          key={activityId}
+                          className="relative flex gap-3"
+                          onMouseEnter={(event) =>
+                            openPopover(
+                              event,
+                              activityId,
+                              { ...activity, title: infoTitle, detail: infoAddress },
+                              imageUrl
+                            )
+                          }
+                          onMouseLeave={() => setActivePopover(null)}
+                          onClick={(event) => {
+                            if (activePopover?.id === activityId) {
+                              setActivePopover(null);
+                              return;
+                            }
+                            openPopover(
+                              event,
+                              activityId,
+                              { ...activity, title: infoTitle, detail: infoAddress },
+                              imageUrl
+                            );
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              if (activePopover?.id === activityId) {
+                                setActivePopover(null);
+                                return;
+                              }
+                              openPopover(
+                                event as unknown as React.MouseEvent<HTMLElement>,
+                                activityId,
+                                { ...activity, title: infoTitle, detail: infoAddress },
+                                imageUrl
+                              );
+                            }
+                          }}
+                          tabIndex={0}
+                        >
+                          <span className={activity.timeClass}>{activity.time}</span>
+                          <div>
+                            <p className="font-bold">{activity.title}</p>
+                            <p className="text-sm">{activity.detail}</p>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+              {activePopover ? (
+                <div
+                  className="fixed z-[9999] w-64 rounded-lg border border-stone-200 bg-white p-3 shadow-xl"
+                  style={{ top: activePopover.top, left: activePopover.left }}
+                >
+                  <div className="mb-2 overflow-hidden rounded-md border border-stone-100">
+                    <img
+                      src={activePopover.imageUrl}
+                      alt={activePopover.activity.title}
+                      className="w-full aspect-[4/3] object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <p className="text-sm font-bold text-slate-800">
+                    {activePopover.activity.title}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {activePopover.activity.detail || "Alamat belum diisi"}
+                  </p>
+                </div>
+              ) : null}
 
               <div
                 id="daily-tip"
