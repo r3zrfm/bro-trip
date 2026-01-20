@@ -77,23 +77,30 @@ export default function Home() {
   const [currentMode, setCurrentMode] = useState<BudgetMode>("press");
   const [currentDay, setCurrentDay] = useState(0);
 
+  const sgColor = currentMode === "press" ? "#10b981" : "#a855f7";
+  const klColor = currentMode === "press" ? "#f59e0b" : "#0ea5e9";
+
   const optionData = itineraryData[currentOption];
   const modeData = optionData[currentMode];
   const dayData = modeData.days[currentDay];
 
   const barData = useMemo(() => {
-    const color = currentMode === "press" ? "#10b981" : "#a855f7";
     return {
       labels: [...costLabels],
       datasets: [
         {
-          label: "Estimasi Biaya (IDR)",
-          data: [...costByOptionMode[currentOption][currentMode]],
-          backgroundColor: [color, color, color],
+          label: "SG + JB",
+          data: [...costByOptionMode.A[currentMode]],
+          backgroundColor: [sgColor, sgColor, sgColor],
+        },
+        {
+          label: "KL + Melaka",
+          data: [...costByOptionMode.B[currentMode]],
+          backgroundColor: [klColor, klColor, klColor],
         },
       ],
     };
-  }, [currentMode, currentOption]);
+  }, [currentMode, klColor, sgColor]);
 
   const tagClasses =
     currentMode === "press"
@@ -170,6 +177,22 @@ export default function Home() {
               <h4 className="text-center font-semibold text-slate-700 mb-4 uppercase tracking-wider text-sm">
                 Estimasi Pengeluaran Saku (Per Orang)
               </h4>
+              <div className="flex justify-center gap-4 text-xs text-slate-600 mb-2">
+                <span className="inline-flex items-center gap-2">
+                  <span
+                    className="inline-block h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: sgColor }}
+                  />
+                  SG + JB
+                </span>
+                <span className="inline-flex items-center gap-2">
+                  <span
+                    className="inline-block h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: klColor }}
+                  />
+                  KL + Melaka
+                </span>
+              </div>
               <div className="chart-container bg-stone-50 rounded-lg p-2 border border-stone-100">
                 <Bar data={barData} options={barOptions} />
               </div>
