@@ -6,7 +6,7 @@ export const itineraryData = {
                         desc: "Wisata gratis, Hawker Food, MRT Only, Dinner jam 19.00.",
                         days: [
                             {
-                                title: "Hari 1: Changi & City Lights", total: "SGD 35 (±410rb)", tip: "Isi air minum gratis di Changi sebelum keluar.",
+                                title: "Hari 1: Changi & City Lights", total: "SGD 35 (+/-410rb)", tip: "Isi air minum gratis di Changi sebelum keluar.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:00</span><div><p class="font-bold">Tiba & Lunch</p><p class="text-sm">Makan di Jewel (SGD 12)</p></div></li>
@@ -18,7 +18,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 2: Library & Zam Zam", total: "SGD 37 (±440rb)", tip: "Library@Orchard itu spot foto gratis yang estetik.",
+                                title: "Hari 2: Library & Zam Zam", total: "SGD 37 (+/-440rb)", tip: "Library@Orchard itu spot foto gratis yang estetik.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:30</span><div><p class="font-bold">Sarapan</p><p class="text-sm">Sandwich 7-Eleven (SGD 5)</p></div></li>
@@ -33,7 +33,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 3: JB Day Trip", total: "SGD 29 (±340rb)", tip: "Harga di JB itu Ringgit, manfaatkan buat makan enak!",
+                                title: "Hari 3: JB Day Trip", total: "SGD 29 (+/-340rb)", tip: "Harga di JB itu Ringgit, manfaatkan buat makan enak!",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">07:30</span><div><p class="font-bold">Sarapan</p><p class="text-sm">Roti Bakar (SGD 5)</p></div></li>
@@ -44,7 +44,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 4: Sentosa & Gardens", total: "SGD 90 (±1jt)", tip: "Garden Rhapsody jam 20:45 itu gratis nonton lampunya.",
+                                title: "Hari 4: Sentosa & Gardens", total: "SGD 90 (+/-1jt)", tip: "Garden Rhapsody jam 20:45 itu gratis nonton lampunya.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:30</span><div><p class="font-bold">Sarapan</p><p class="text-sm">Roti Tawar/Minimarket (SGD 4)</p></div></li>
@@ -58,7 +58,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 5: Pulang", total: "SGD 23 (±270rb)", tip: "Jangan lupa refund kartu transportasi kalo ada sisa banyak.",
+                                title: "Hari 5: Pulang", total: "SGD 23 (+/-270rb)", tip: "Jangan lupa refund kartu transportasi kalo ada sisa banyak.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:30</span><div><p class="font-bold">Sarapan Little India</p><p class="text-sm">MRT ke Little India (SGD 2). Prata (SGD 8)</p></div></li>
@@ -73,7 +73,7 @@ export const itineraryData = {
                         desc: "Full Grab, Makan Resto AC, Wahana Berbayar.",
                         days: [
                             {
-                                title: "Hari 1: Changi & Cruise", total: "SGD 94 (±1.1jt)", tip: "Naik Grab bertiga lebih hemat tenaga dibanding geret koper di MRT.",
+                                title: "Hari 1: Changi & Cruise", total: "SGD 94 (+/-1.1jt)", tip: "Naik Grab bertiga lebih hemat tenaga dibanding geret koper di MRT.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:00</span><div><p class="font-bold">Tiba & Lunch</p><p class="text-sm">Shake Shack Jewel (SGD 20)</p></div></li>
@@ -85,7 +85,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 2: Full Gardens", total: "SGD 150 (±1.8jt)", tip: "Tiong Bahru Bakery punya croissant terbaik di SG.",
+                                title: "Hari 2: Full Gardens", total: "SGD 150 (+/-1.8jt)", tip: "Tiong Bahru Bakery punya croissant terbaik di SG.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:00</span><div><p class="font-bold">Breakfast Sultan</p><p class="text-sm">Tiong Bahru Bakery (SGD 15)</p></div></li>
@@ -93,13 +93,13 @@ export const itineraryData = {
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">10:00</span><div><p class="font-bold">Gardens Full Access</p><p class="text-sm">Cloud Forest, Dome, Floral (SGD 65)</p></div></li>
                                     <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:00</span><div><p class="font-bold">Grab ke Song Fa</p><p class="text-sm">Patungan (SGD 5)</p></div></li>
                                     <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:30</span><div><p class="font-bold">Lunch Song Fa</p><p class="text-sm">Resto AC (SGD 22)</p></div></li>
-                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-15:30</span><div><p class="font-bold">Grab ke Orchard</p><p class="text-sm">Patungan (SGD 5)</p></div></li>
+                                    <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">15:30</span><div><p class="font-bold">Grab ke Orchard</p><p class="text-sm">Patungan (SGD 5)</p></div></li>
                                     <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">19:00</span><div><p class="font-bold">Dinner Clarke Quay</p><p class="text-sm">Grab ke lokasi (SGD 5). Makan (SGD 30)</p></div></li>
                                     <li class="flex gap-3"><span class="font-bold text-slate-500 w-16 shrink-0">23:30</span><div><p class="font-bold">Grab Balik Hotel</p><p class="text-sm">Patungan (SGD 8)</p></div></li>
                                 </ul>`
                             },
                             {
-                                title: "Hari 3: Private JB Trip", total: "SGD 110 (±1.3jt)", tip: "Sewa mobil private = bebas antre imigrasi.",
+                                title: "Hari 3: Private JB Trip", total: "SGD 110 (+/-1.3jt)", tip: "Sewa mobil private = bebas antre imigrasi.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:00</span><div><p class="font-bold">Private Car ke JB</p><p class="text-sm">Jemput di Hotel (SGD 20/org)</p></div></li>
@@ -110,7 +110,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 4: Sentosa Fun", total: "SGD 160 (±1.9jt)", tip: "Main Luge minimal 3x baru puas!",
+                                title: "Hari 4: Sentosa Fun", total: "SGD 160 (+/-1.9jt)", tip: "Main Luge minimal 3x baru puas!",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:00</span><div><p class="font-bold">Breakfast</p><p class="text-sm">Toast Box (SGD 10)</p></div></li>
@@ -123,7 +123,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 5: Tiong Bahru", total: "SGD 46 (±540rb)", tip: "Croissant Tiong Bahru Bakery itu legendaris.",
+                                title: "Hari 5: Tiong Bahru", total: "SGD 46 (+/-540rb)", tip: "Croissant Tiong Bahru Bakery itu legendaris.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:00</span><div><p class="font-bold">Breakfast Sultan</p><p class="text-sm">Tiong Bahru Bakery (SGD 23)</p></div></li>
@@ -141,7 +141,7 @@ export const itineraryData = {
                         desc: "Grab bertiga, MyCiti Hotel, Makan Enak.",
                         days: [
                             {
-                                title: "Hari 1: City & Alor", total: "RM 80 (±290rb)", tip: "Grab bertiga di KL jauh lebih murah dari KLIA Ekspres.",
+                                title: "Hari 1: City & Alor", total: "RM 80 (+/-290rb)", tip: "Grab bertiga di KL jauh lebih murah dari KLIA Ekspres.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:00</span><div><p class="font-bold">Tiba & Grab Hotel</p><p class="text-sm">MyCiti Hotel (RM 25/org)</p></div></li>
@@ -153,7 +153,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 2: Batu & Genting", total: "RM 120 (±430rb)", tip: "Naik Awana Skyway dapet view hutan yang keren.",
+                                title: "Hari 2: Batu & Genting", total: "RM 120 (+/-430rb)", tip: "Naik Awana Skyway dapet view hutan yang keren.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:00</span><div><p class="font-bold">Sarapan</p><p class="text-sm">Roti Canai + Teh Tarik (RM 10)</p></div></li>
@@ -166,7 +166,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 3: Melaka Trip", total: "RM 135 (±480rb)", tip: "Jonker Street itu wajib banget buat kulineran malam.",
+                                title: "Hari 3: Melaka Trip", total: "RM 135 (+/-480rb)", tip: "Jonker Street itu wajib banget buat kulineran malam.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">07:30</span><div><p class="font-bold">Sarapan</p><p class="text-sm">Sandwich/Minimarket (RM 10)</p></div></li>
@@ -178,7 +178,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 4: Aquaria & Putrajaya", total: "RM 215 (±770rb)", tip: "Putrajaya kalau malam lampunya bagus banget buat foto.",
+                                title: "Hari 4: Aquaria & Putrajaya", total: "RM 215 (+/-770rb)", tip: "Putrajaya kalau malam lampunya bagus banget buat foto.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:30</span><div><p class="font-bold">Sarapan</p><p class="text-sm">Roti Bakar (RM 10)</p></div></li>
@@ -191,7 +191,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 5: Oleh-oleh", total: "RM 185 (±660rb)", tip: "Belanja coklat di Mydin lebih murah dari bandara.",
+                                title: "Hari 5: Oleh-oleh", total: "RM 185 (+/-660rb)", tip: "Belanja coklat di Mydin lebih murah dari bandara.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:30</span><div><p class="font-bold">Sarapan</p><p class="text-sm">Masjid India (RM 15)</p></div></li>
@@ -206,7 +206,7 @@ export const itineraryData = {
                         desc: "Private Car Melaka, SkyWorlds, Fine Dining.",
                         days: [
                             {
-                                title: "Hari 1: Luxury KL", total: "RM 295 (±1jt)", tip: "Heli Lounge Bar harus booking dulu biar dapet spot sunset.",
+                                title: "Hari 1: Luxury KL", total: "RM 295 (+/-1jt)", tip: "Heli Lounge Bar harus booking dulu biar dapet spot sunset.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-orange-500 w-16 shrink-0">13:00</span><div><p class="font-bold">Tiba di KLIA</p><p class="text-sm">Grab Premium ke Hotel (RM 35)</p></div></li>
@@ -217,7 +217,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 2: SkyWorlds", total: "RM 355 (±1.2jt)", tip: "Main SkyWorlds seharian worth it banget.",
+                                title: "Hari 2: SkyWorlds", total: "RM 355 (+/-1.2jt)", tip: "Main SkyWorlds seharian worth it banget.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:00</span><div><p class="font-bold">Sarapan & Batu Caves</p><p class="text-sm">Makan (RM 30). Grab (RM 10)</p></div></li>
@@ -228,7 +228,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 3: Private Melaka", total: "RM 290 (±1jt)", tip: "Sewa mobil private = anti capek di jalan.",
+                                title: "Hari 3: Private Melaka", total: "RM 290 (+/-1jt)", tip: "Sewa mobil private = anti capek di jalan.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">08:00</span><div><p class="font-bold">Private Car Melaka</p><p class="text-sm">Jemput di Hotel (RM 100/org)</p></div></li>
@@ -239,7 +239,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 4: Shop & Fine Dining", total: "RM 585 (±2.1jt)", tip: "Fine Dining di KL harganya masih masuk akal dibanding SG.",
+                                title: "Hari 4: Shop & Fine Dining", total: "RM 585 (+/-2.1jt)", tip: "Fine Dining di KL harganya masih masuk akal dibanding SG.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:00</span><div><p class="font-bold">Sarapan Cafe</p><p class="text-sm">Petaling St (RM 40)</p></div></li>
@@ -251,7 +251,7 @@ export const itineraryData = {
                                 </ul>`
                             },
                             {
-                                title: "Hari 5: Premium Oleh-oleh", total: "RM 220 (±790rb)", tip: "Beryl's Coklat kaleng enak banget buat oleh-oleh.",
+                                title: "Hari 5: Premium Oleh-oleh", total: "RM 220 (+/-790rb)", tip: "Beryl's Coklat kaleng enak banget buat oleh-oleh.",
                                 content: `
                                 <ul class="list-none space-y-4">
                                     <li class="flex gap-3"><span class="font-bold text-sky-500 w-16 shrink-0">09:30</span><div><p class="font-bold">Sarapan Cafe</p><p class="text-sm">Merchant's Lane (RM 40)</p></div></li>
