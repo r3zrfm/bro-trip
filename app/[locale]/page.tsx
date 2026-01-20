@@ -322,9 +322,12 @@ export default function Home() {
     imageUrl: string
   ) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    const width = 260;
     const offset = 10;
-    const left = Math.min(rect.left + 64, window.innerWidth - width - 16);
+    const isNarrow = window.innerWidth < 640;
+    const width = isNarrow ? Math.min(320, window.innerWidth - 32) : 260;
+    const left = isNarrow
+      ? 16
+      : Math.min(rect.left + 64, window.innerWidth - width - 16);
     const top = rect.bottom + offset;
 
     setActivePopover({ id: activityId, activity, imageUrl, top, left });
@@ -333,31 +336,40 @@ export default function Home() {
   return (
     <>
       <header className="bg-slate-900 text-stone-100 shadow-lg sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-amber-500">
+        <div className="container mx-auto px-4 py-3 md:py-4 flex flex-col md:flex-row justify-between gap-3">
+          <div className="text-center md:text-left">
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-amber-500">
               {copy.headerTitle}
               <span className="text-xs text-stone-400 font-normal border border-stone-600 rounded px-2 py-0.5 ml-2">
                 {copy.headerEdition}
               </span>
             </h1>
-            <p className="text-xs text-stone-400 mt-1">
-              {copy.headerSub}
-            </p>
+            <p className="text-[11px] md:text-xs text-stone-400 mt-1">{copy.headerSub}</p>
           </div>
-          <div className="mt-4 md:mt-0 flex flex-col md:flex-row md:items-center gap-3">
-            <nav className="space-x-4 text-sm font-medium">
-              <a href="#showdown" className="hover:text-amber-400 transition-colors">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+            <nav className="hidden md:block w-full md:w-auto">
+              <div className="flex items-center justify-center md:justify-start gap-2 text-xs font-semibold uppercase tracking-wide bg-slate-800/70 rounded-full px-2 py-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <a
+                  href="#showdown"
+                  className="px-2 py-1 rounded-full text-stone-200 hover:text-amber-300 transition-colors whitespace-nowrap"
+                >
                 {copy.navCompare}
-              </a>
-              <a href="#itinerary" className="hover:text-amber-400 transition-colors">
+                </a>
+                <a
+                  href="#itinerary"
+                  className="px-2 py-1 rounded-full text-stone-200 hover:text-amber-300 transition-colors whitespace-nowrap"
+                >
                 {copy.navItinerary}
-              </a>
-              <a href="#tips" className="hover:text-amber-400 transition-colors">
+                </a>
+                <a
+                  href="#tips"
+                  className="px-2 py-1 rounded-full text-stone-200 hover:text-amber-300 transition-colors whitespace-nowrap"
+                >
                 {copy.navTips}
-              </a>
+                </a>
+              </div>
             </nav>
-            <div className="flex items-center gap-2 text-xs text-stone-400">
+            <div className="flex items-center justify-center md:justify-end gap-2 text-xs text-stone-400">
               <a
                 href="/id"
                 className={`flex items-center gap-1 rounded border px-2 py-1 ${
@@ -393,7 +405,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 space-y-12">
+      <main className="container mx-auto px-4 py-6 md:py-8 space-y-10 md:space-y-12">
         <section className="text-center max-w-3xl mx-auto mb-12 fade-in">
           <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
             {copy.heroTitle}
@@ -552,7 +564,7 @@ export default function Home() {
                 {modeData.days.map((day, index) => {
                   const isActive = index === currentDay;
                   const baseClasses =
-                    "flex-shrink-0 w-auto p-3 text-xs border-r border-stone-200 transition-colors flex justify-between items-center md:w-full md:text-left md:text-sm md:p-4 md:border-b md:border-r-0";
+                    "flex-shrink-0 w-auto p-2 text-[11px] border-r border-stone-200 transition-colors flex justify-between items-center md:w-full md:text-left md:text-sm md:p-4 md:border-b md:border-r-0";
                   const activeClasses = isActive
                     ? "bg-white text-amber-600 border-b-4 border-b-amber-500 md:border-b-0 md:border-l-4 md:border-l-amber-500"
                     : "text-slate-500 bg-stone-50 hover:bg-slate-50";
@@ -600,7 +612,7 @@ export default function Home() {
               <div
                 key={`${currentOption}-${currentMode}-${currentDay}`}
                 id="itinerary-content"
-                className="flex-grow space-y-6 text-slate-700 custom-scroll overflow-y-auto max-h-[600px] pr-2 fade-in"
+                className="flex-grow space-y-6 text-slate-700 custom-scroll overflow-y-auto max-h-[420px] md:max-h-[600px] pr-2 fade-in"
                 onScroll={() => setActivePopover(null)}
               >
                 {!isHydrated ? (
@@ -673,7 +685,7 @@ export default function Home() {
               </div>
               {activePopover ? (
                 <div
-                  className="fixed z-[9999] w-64 rounded-lg border border-stone-200 bg-white p-3 shadow-xl"
+                  className="fixed z-[9999] w-[calc(100vw-2rem)] max-w-xs rounded-lg border border-stone-200 bg-white p-3 shadow-xl md:w-64"
                   style={{ top: activePopover.top, left: activePopover.left }}
                 >
                   <div className="mb-2 overflow-hidden rounded-md border border-stone-100">
@@ -735,6 +747,19 @@ export default function Home() {
           </p>
         </div>
       </footer>
+      <nav className="md:hidden fixed bottom-4 inset-x-4 z-50">
+        <div className="flex items-center justify-around gap-2 rounded-full bg-slate-900/95 border border-slate-700 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-stone-200 shadow-lg">
+          <a href="#showdown" className="px-3 py-1 rounded-full hover:text-amber-300">
+            {copy.navCompare}
+          </a>
+          <a href="#itinerary" className="px-3 py-1 rounded-full hover:text-amber-300">
+            {copy.navItinerary}
+          </a>
+          <a href="#tips" className="px-3 py-1 rounded-full hover:text-amber-300">
+            {copy.navTips}
+          </a>
+        </div>
+      </nav>
     </>
   );
 }

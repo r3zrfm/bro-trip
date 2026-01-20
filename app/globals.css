@@ -12,13 +12,13 @@ html {
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
-  height: 300px;
-  max-height: 400px;
+  height: 240px;
+  max-height: 360px;
 }
 
 @media (min-width: 768px) {
   .chart-container {
-    height: 350px;
+    height: 320px;
   }
 }
 
