@@ -264,8 +264,5 @@ export const itineraryDataEn = {
                 }
             };
 
-export type TripOption = keyof typeof itineraryData;
-export type BudgetMode = Exclude<keyof typeof itineraryData["A"], "name">;
-
 export type TripOption = keyof typeof itineraryDataEn;
-export type BudgetMode = Exclude<keyof typeof itineraryDataEn['A'], 'name'>;
+export type BudgetMode = Exclude<keyof typeof itineraryDataEn["A"], "name">;

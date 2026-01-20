@@ -261,9 +261,9 @@ export default function Home() {
     [dayData.content, isHydrated]
   );
 
-  const radarData = useMemo(
+  const radarData = useMemo<ChartData<"radar", number[], string>>(
     () => ({
-      labels: copy.radarLabels,
+      labels: [...copy.radarLabels],
       datasets: [
         {
           label: copy.optionA,
