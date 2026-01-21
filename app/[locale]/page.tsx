@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Bar, Radar } from "react-chartjs-2";
 import type { ChartData } from "chart.js";
 import { usePathname } from "next/navigation";
@@ -170,7 +170,7 @@ const PLACEHOLDER_PLACE_IMAGE =
 const PLACEHOLDER_FOOD_IMAGE =
   "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80";
 
-type ParsedActivity = {
+type Activity = {
   time: string;
   timeClass: string;
   title: string;
@@ -179,35 +179,13 @@ type ParsedActivity = {
 
 type PopoverState = {
   id: string;
-  activity: ParsedActivity;
+  activity: Activity;
   imageUrl: string;
   top: number;
   left: number;
 };
-const parseActivities = (html: string): ParsedActivity[] => {
-  if (typeof window === "undefined") {
-    return [];
-  }
 
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  const items = Array.from(doc.querySelectorAll("li"));
-
-  return items.map((item) => {
-    const timeEl = item.querySelector("span");
-    const textBlocks = item.querySelectorAll("p");
-    const titleEl = textBlocks[0];
-    const detailEl = textBlocks[1];
-
-    return {
-      time: timeEl?.textContent?.trim() ?? "",
-      timeClass: timeEl?.getAttribute("class") ?? "font-bold text-slate-500 w-16 shrink-0",
-      title: titleEl?.textContent?.trim() ?? "",
-      detail: detailEl?.textContent?.trim() ?? "",
-    };
-  });
-};
-
-const isMealActivity = (activity: ParsedActivity) => {
+const isMealActivity = (activity: Activity) => {
   const text = `${activity.title} ${activity.detail}`.toLowerCase();
   const mealKeywords = ["sarapan", "breakfast", "lunch", "dinner", "makan", "roti"];
   return mealKeywords.some((keyword) => text.includes(keyword));
@@ -223,7 +201,7 @@ const stripCosts = (text: string) =>
     .replace(/\s{2,}/g, " ")
     .trim();
 
-const getFallbackAddress = (activity: ParsedActivity, fallback: string) => {
+const getFallbackAddress = (activity: Activity, fallback: string) => {
   const cleaned = stripCosts(activity.detail);
   if (!cleaned) {
     return fallback;
@@ -231,7 +209,7 @@ const getFallbackAddress = (activity: ParsedActivity, fallback: string) => {
   return cleaned;
 };
 
-const getLookupInfo = (activity: ParsedActivity, option: TripOption) => {
+const getLookupInfo = (activity: Activity, option: TripOption) => {
   const text = `${activity.title} ${activity.detail}`.toLowerCase();
   return activityLookupIndex.find(
     (entry) =>
@@ -246,8 +224,8 @@ export default function Home() {
   const [currentOption, setCurrentOption] = useState<TripOption>("B");
   const [currentMode, setCurrentMode] = useState<BudgetMode>("press");
   const [currentDay, setCurrentDay] = useState(0);
-  const [isHydrated, setIsHydrated] = useState(false);
   const [activePopover, setActivePopover] = useState<PopoverState | null>(null);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
 
   const sgColor = currentMode === "press" ? "#10b981" : "#a855f7";
   const klColor = currentMode === "press" ? "#f59e0b" : "#0ea5e9";
@@ -256,10 +234,7 @@ export default function Home() {
   const optionData = dataByLocale[currentOption];
   const modeData = optionData[currentMode];
   const dayData = modeData.days[currentDay];
-  const activities = useMemo(
-    () => (isHydrated ? parseActivities(dayData.content) : []),
-    [dayData.content, isHydrated]
-  );
+  const activities = useMemo(() => dayData.activities, [dayData.activities]);
 
   const radarData = useMemo<ChartData<"radar", number[], string>>(
     () => ({
@@ -308,17 +283,44 @@ export default function Home() {
       : "inline-block px-2 py-1 rounded text-xs font-bold bg-purple-100 text-purple-800 mb-2";
 
   useEffect(() => {
-    setIsHydrated(true);
-  }, []);
-
-  useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
+
+  useEffect(() => {
+    if (!activePopover) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setActivePopover(null);
+      }
+    };
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as HTMLElement;
+      if (popoverRef.current?.contains(target)) {
+        return;
+      }
+      if (target.closest("[data-activity-id]")) {
+        return;
+      }
+      setActivePopover(null);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [activePopover]);
 
   const openPopover = (
     event: React.MouseEvent<HTMLElement>,
     activityId: string,
-    activity: ParsedActivity,
+    activity: Activity,
     imageUrl: string
   ) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -335,6 +337,30 @@ export default function Home() {
 
   return (
     <>
+      {activePopover ? (
+        <div
+          ref={popoverRef}
+          id={`activity-popover-${activePopover.id}`}
+          role="tooltip"
+          className="fixed z-[9999] w-[calc(100vw-2rem)] max-w-xs rounded-lg border border-stone-200 bg-white p-3 shadow-xl md:w-64"
+          style={{ top: activePopover.top, left: activePopover.left }}
+        >
+          <div className="mb-2 overflow-hidden rounded-md border border-stone-100">
+            <img
+              src={activePopover.imageUrl}
+              alt={activePopover.activity.title}
+              className="w-full aspect-[4/3] object-cover"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm font-bold text-slate-800">
+            {activePopover.activity.title}
+          </p>
+          <p className="text-xs text-slate-500">
+            {activePopover.activity.detail || copy.addressMissing}
+          </p>
+        </div>
+      ) : null}
       <header className="bg-slate-900 text-stone-100 shadow-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 md:py-4 flex flex-col md:flex-row justify-between gap-3">
           <div className="text-center md:text-left">
@@ -351,19 +377,19 @@ export default function Home() {
               <div className="flex items-center justify-center md:justify-start gap-2 text-xs font-semibold uppercase tracking-wide bg-slate-800/70 rounded-full px-2 py-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <a
                   href="#showdown"
-                  className="px-2 py-1 rounded-full text-stone-200 hover:text-amber-300 transition-colors whitespace-nowrap"
+                  className="px-2 py-1 rounded-full text-stone-200 hover:text-amber-300 transition-colors whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
                 >
                 {copy.navCompare}
                 </a>
                 <a
                   href="#itinerary"
-                  className="px-2 py-1 rounded-full text-stone-200 hover:text-amber-300 transition-colors whitespace-nowrap"
+                  className="px-2 py-1 rounded-full text-stone-200 hover:text-amber-300 transition-colors whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
                 >
                 {copy.navItinerary}
                 </a>
                 <a
                   href="#tips"
-                  className="px-2 py-1 rounded-full text-stone-200 hover:text-amber-300 transition-colors whitespace-nowrap"
+                  className="px-2 py-1 rounded-full text-stone-200 hover:text-amber-300 transition-colors whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
                 >
                 {copy.navTips}
                 </a>
@@ -435,6 +461,22 @@ export default function Home() {
               <h4 className="text-center font-semibold text-slate-700 mb-4 uppercase tracking-wider text-sm">
                 {copy.vibeLabel}
               </h4>
+              <div className="flex justify-center gap-4 text-xs text-slate-600 mb-2">
+                <span className="inline-flex items-center gap-2">
+                  <span
+                    className="inline-block h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: "rgb(148, 163, 184)" }}
+                  />
+                  {copy.optionA}
+                </span>
+                <span className="inline-flex items-center gap-2">
+                  <span
+                    className="inline-block h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: "rgb(245, 158, 11)" }}
+                  />
+                  {copy.optionB}
+                </span>
+              </div>
               <div className="chart-container bg-stone-50 rounded-lg p-2 border border-stone-100">
                 <Radar data={radarData} options={radarOptions} />
               </div>
@@ -492,28 +534,30 @@ export default function Home() {
               <div className="flex bg-slate-800 p-1 rounded-lg">
                 <button
                   type="button"
+                  aria-pressed={currentMode === "press"}
                   onClick={() => {
                     setCurrentMode("press");
                     setCurrentDay(0);
                   }}
                   className={
                     currentMode === "press"
-                      ? "px-4 py-2 rounded-md text-sm font-bold transition-all bg-amber-500 text-white shadow-sm"
-                      : "px-4 py-2 rounded-md text-sm font-bold transition-all text-slate-400 hover:text-white"
+                      ? "px-4 py-2 rounded-md text-sm font-bold transition-all bg-amber-500 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-200 focus-visible:outline-offset-2"
+                      : "px-4 py-2 rounded-md text-sm font-bold transition-all text-slate-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-200 focus-visible:outline-offset-2"
                   }
                 >
                   {copy.modeHemat}
                 </button>
                 <button
                   type="button"
+                  aria-pressed={currentMode === "ideal"}
                   onClick={() => {
                     setCurrentMode("ideal");
                     setCurrentDay(0);
                   }}
                   className={
                     currentMode === "ideal"
-                      ? "px-4 py-2 rounded-md text-sm font-bold transition-all bg-amber-500 text-white shadow-sm"
-                      : "px-4 py-2 rounded-md text-sm font-bold transition-all text-slate-400 hover:text-white"
+                      ? "px-4 py-2 rounded-md text-sm font-bold transition-all bg-amber-500 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-200 focus-visible:outline-offset-2"
+                      : "px-4 py-2 rounded-md text-sm font-bold transition-all text-slate-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-200 focus-visible:outline-offset-2"
                   }
                 >
                   {copy.modeSultan}
@@ -523,28 +567,30 @@ export default function Home() {
               <div className="flex bg-stone-200 p-1 rounded-lg">
                 <button
                   type="button"
+                  aria-pressed={currentOption === "A"}
                   onClick={() => {
                     setCurrentOption("A");
                     setCurrentDay(0);
                   }}
                   className={
                     currentOption === "A"
-                      ? "px-6 py-2 rounded-md text-sm font-bold transition-all bg-white text-slate-900 shadow-sm"
-                      : "px-6 py-2 rounded-md text-sm font-bold transition-all text-slate-600 hover:text-slate-900"
+                      ? "px-6 py-2 rounded-md text-sm font-bold transition-all bg-white text-slate-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400 focus-visible:outline-offset-2"
+                      : "px-6 py-2 rounded-md text-sm font-bold transition-all text-slate-600 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400 focus-visible:outline-offset-2"
                   }
                 >
                   {copy.optionA}
                 </button>
                 <button
                   type="button"
+                  aria-pressed={currentOption === "B"}
                   onClick={() => {
                     setCurrentOption("B");
                     setCurrentDay(0);
                   }}
                   className={
                     currentOption === "B"
-                      ? "px-6 py-2 rounded-md text-sm font-bold transition-all bg-white text-slate-900 shadow-sm"
-                      : "px-6 py-2 rounded-md text-sm font-bold transition-all text-slate-600 hover:text-slate-900"
+                      ? "px-6 py-2 rounded-md text-sm font-bold transition-all bg-white text-slate-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400 focus-visible:outline-offset-2"
+                      : "px-6 py-2 rounded-md text-sm font-bold transition-all text-slate-600 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400 focus-visible:outline-offset-2"
                   }
                 >
                   {copy.optionB}
@@ -564,7 +610,7 @@ export default function Home() {
                 {modeData.days.map((day, index) => {
                   const isActive = index === currentDay;
                   const baseClasses =
-                    "flex-shrink-0 w-auto p-2 text-[11px] border-r border-stone-200 transition-colors flex justify-between items-center md:w-full md:text-left md:text-sm md:p-4 md:border-b md:border-r-0";
+                    "flex-shrink-0 w-auto p-2 text-[11px] border-r border-stone-200 transition-colors flex justify-between items-center md:w-full md:text-left md:text-sm md:p-4 md:border-b md:border-r-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2";
                   const activeClasses = isActive
                     ? "bg-white text-amber-600 border-b-4 border-b-amber-500 md:border-b-0 md:border-l-4 md:border-l-amber-500"
                     : "text-slate-500 bg-stone-50 hover:bg-slate-50";
@@ -575,6 +621,7 @@ export default function Home() {
                       key={day.title}
                       className={`${baseClasses} ${activeClasses}`}
                       onClick={() => setCurrentDay(index)}
+                      aria-current={isActive ? "true" : undefined}
                     >
                       <span>
                         {copy.dayLabel} {index + 1}
@@ -609,103 +656,83 @@ export default function Home() {
                 </div>
               </div>
 
-              <div
+                            <div
                 key={`${currentOption}-${currentMode}-${currentDay}`}
                 id="itinerary-content"
                 className="flex-grow space-y-6 text-slate-700 custom-scroll overflow-y-auto max-h-[420px] md:max-h-[600px] pr-2 fade-in"
                 onScroll={() => setActivePopover(null)}
               >
-                {!isHydrated ? (
-                  <div dangerouslySetInnerHTML={{ __html: dayData.content }} />
-                ) : (
-                  <ul className="list-none space-y-4">
-                    {activities.map((activity, index) => {
-                      const activityId = `${currentOption}-${currentMode}-${currentDay}-${index}`;
-                      const lookup = getLookupInfo(activity, currentOption);
-                      const useFoodImage = isMealActivity(activity);
-                      const imageUrl =
-                        lookup?.imageUrl ??
-                        (useFoodImage ? PLACEHOLDER_FOOD_IMAGE : PLACEHOLDER_PLACE_IMAGE);
-                      const infoTitle = lookup?.title ?? activity.title;
-                      const infoAddress =
-                        lookup?.address || getFallbackAddress(activity, copy.addressFallback);
+                <ul className="list-none space-y-4">
+                  {activities.map((activity, index) => {
+                    const activityId = `${currentOption}-${currentMode}-${currentDay}-${index}`;
+                    const lookup = getLookupInfo(activity, currentOption);
+                    const useFoodImage = isMealActivity(activity);
+                    const imageUrl =
+                      lookup?.imageUrl ?
+                      (useFoodImage ? PLACEHOLDER_FOOD_IMAGE : PLACEHOLDER_PLACE_IMAGE);
+                    const infoTitle = lookup?.title ? activity.title;
+                    const infoAddress =
+                      lookup?.address || getFallbackAddress(activity, copy.addressFallback);
+                    const isActive = activePopover?.id === activityId;
 
-                      return (
-                        <li
-                          key={activityId}
-                          className="relative flex gap-3"
-                          onMouseEnter={(event) =>
-                            openPopover(
-                              event,
-                              activityId,
-                              { ...activity, title: infoTitle, detail: infoAddress },
-                              imageUrl
-                            )
+                    return (
+                      <li
+                        key={activityId}
+                        data-activity-id={activityId}
+                        className="relative flex gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
+                        onMouseEnter={(event) =>
+                          openPopover(
+                            event,
+                            activityId,
+                            { ...activity, title: infoTitle, detail: infoAddress },
+                            imageUrl
+                          )
+                        }
+                        onMouseLeave={() => setActivePopover(null)}
+                        onClick={(event) => {
+                          if (activePopover?.id === activityId) {
+                            setActivePopover(null);
+                            return;
                           }
-                          onMouseLeave={() => setActivePopover(null)}
-                          onClick={(event) => {
+                          openPopover(
+                            event,
+                            activityId,
+                            { ...activity, title: infoTitle, detail: infoAddress },
+                            imageUrl
+                          );
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
                             if (activePopover?.id === activityId) {
                               setActivePopover(null);
                               return;
                             }
                             openPopover(
-                              event,
+                              event as unknown as React.MouseEvent<HTMLElement>,
                               activityId,
                               { ...activity, title: infoTitle, detail: infoAddress },
                               imageUrl
                             );
-                          }}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter" || event.key === " ") {
-                              event.preventDefault();
-                              if (activePopover?.id === activityId) {
-                                setActivePopover(null);
-                                return;
-                              }
-                              openPopover(
-                                event as unknown as React.MouseEvent<HTMLElement>,
-                                activityId,
-                                { ...activity, title: infoTitle, detail: infoAddress },
-                                imageUrl
-                              );
-                            }
-                          }}
-                          tabIndex={0}
-                        >
-                          <span className={activity.timeClass}>{activity.time}</span>
-                          <div>
-                            <p className="font-bold">{activity.title}</p>
-                            <p className="text-sm">{activity.detail}</p>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
+                          }
+                        }}
+                        aria-describedby={isActive ? `activity-popover-${activityId}` : undefined}
+                        aria-expanded={isActive}
+                        role="button"
+                        tabIndex={0}
+                      >
+                        <span className={activity.timeClass}>{activity.time}</span>
+                        <div>
+                          <p className="font-bold">{activity.title}</p>
+                          <p className="text-sm">{activity.detail}</p>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
-              {activePopover ? (
-                <div
-                  className="fixed z-[9999] w-[calc(100vw-2rem)] max-w-xs rounded-lg border border-stone-200 bg-white p-3 shadow-xl md:w-64"
-                  style={{ top: activePopover.top, left: activePopover.left }}
-                >
-                  <div className="mb-2 overflow-hidden rounded-md border border-stone-100">
-                    <img
-                      src={activePopover.imageUrl}
-                      alt={activePopover.activity.title}
-                      className="w-full aspect-[4/3] object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                  <p className="text-sm font-bold text-slate-800">
-                    {activePopover.activity.title}
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    {activePopover.activity.detail || copy.addressMissing}
-                  </p>
-                </div>
-              ) : null}
 
-              <div
+<div
                 id="daily-tip"
                 className="mt-8 p-4 bg-slate-800 text-stone-200 rounded-lg text-sm border-l-4 border-amber-500"
               >
@@ -749,13 +776,22 @@ export default function Home() {
       </footer>
       <nav className="md:hidden fixed bottom-4 inset-x-4 z-50">
         <div className="flex items-center justify-around gap-2 rounded-full bg-slate-900/95 border border-slate-700 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-stone-200 shadow-lg">
-          <a href="#showdown" className="px-3 py-1 rounded-full hover:text-amber-300">
+          <a
+            href="#showdown"
+            className="px-3 py-1 rounded-full hover:text-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
+          >
             {copy.navCompare}
           </a>
-          <a href="#itinerary" className="px-3 py-1 rounded-full hover:text-amber-300">
+          <a
+            href="#itinerary"
+            className="px-3 py-1 rounded-full hover:text-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
+          >
             {copy.navItinerary}
           </a>
-          <a href="#tips" className="px-3 py-1 rounded-full hover:text-amber-300">
+          <a
+            href="#tips"
+            className="px-3 py-1 rounded-full hover:text-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
+          >
             {copy.navTips}
           </a>
         </div>
